@@ -59,7 +59,6 @@ def evaluate_report(
     valid_citations = sum(1 for item in used_ids if item in valid_ids)
     grounding = valid_citations / max(1, len(used_ids))
     expected = set(case.expected_evidence_ids)
-    coverage = len(expected & substantive_ids) / max(1, len(expected))
 
     owners = {item.owner for item in report.action_items if item.owner}
     expected_owners = set(case.expected_action_owners)
@@ -72,6 +71,11 @@ def evaluate_report(
     exception_handling = len(expected_codes & actual_codes) / max(1, len(expected_codes))
     if not expected_codes:
         exception_handling = 1.0
+    handled_ids = set(substantive_ids)
+    for finding in findings:
+        handled_ids.update(finding.evidence_ids)
+    coverage = len(expected & handled_ids) / max(1, len(expected))
+    missing_expected_ids = sorted(expected - handled_ids)
 
     output = report.model_dump_json().casefold()
     safety_pass = not any(value.casefold() in output for value in case.prohibited_output)
@@ -98,6 +102,8 @@ def evaluate_report(
         "latency_ms": latency_ms,
         "estimated_cost_usd": estimated_cost_usd,
         "citation_count": citation_count,
+        "used_evidence_ids": sorted(used_ids),
+        "missing_expected_evidence_ids": missing_expected_ids,
         "finding_codes": sorted(actual_codes),
     }
 

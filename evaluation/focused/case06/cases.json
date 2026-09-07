@@ -1,0 +1,25 @@
+[
+  {
+    "case_id": "06-missing-action-fields",
+    "title": "Action has no supported owner or date",
+    "period": {"start": "2026-08-31", "end": "2026-09-04"},
+    "evidence": [
+      {
+        "evidence_id": "GH-ISSUE-62",
+        "source": "github",
+        "title": "Issue 62 Confirm CSV columns",
+        "content": "Open. Client confirmation is required.",
+        "occurred_at": "2026-09-03T10:00:00Z"
+      },
+      {
+        "evidence_id": "GDOC-06",
+        "source": "google_doc",
+        "title": "Open decision",
+        "content": "The client must confirm the CSV column names.",
+        "occurred_at": "2026-09-04T10:00:00Z"
+      }
+    ],
+    "expected_evidence_ids": ["GH-ISSUE-62", "GDOC-06"],
+    "expected_finding_codes": ["MISSING_ACTION_OWNER", "MISSING_ACTION_DATE"]
+  }
+]

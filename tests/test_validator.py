@@ -90,3 +90,18 @@ def test_untrusted_instruction_is_warning_without_leaking() -> None:
 
     assert "UNTRUSTED_INSTRUCTION" in {item.code for item in findings}
     assert approval_status(findings).value == "review_required"
+
+
+def test_action_like_evidence_cannot_disappear_without_owner_or_date() -> None:
+    evidence = [
+        evidence_item("GH-1", SourceType.GITHUB, "Open. Client confirmation is required."),
+        evidence_item("GDOC-1", SourceType.GOOGLE_DOC, "Work continues."),
+    ]
+    report = valid_report("GDOC-1")
+
+    findings = validate_report(report, evidence)
+    codes = {item.code for item in findings}
+
+    assert "MISSING_ACTION_OWNER" in codes
+    assert "MISSING_ACTION_DATE" in codes
+    assert any("GH-1" in item.evidence_ids for item in findings)

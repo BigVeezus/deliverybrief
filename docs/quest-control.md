@@ -27,7 +27,8 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [x] Add local `--estimate-only` and `--max-estimated-cost-usd` protections before paid Anthropic evaluation runs.
 - [ ] Verify repository-restricted, read-only GitHub access.
 - [ ] Share one anonymized Google Drive folder with the service account as Viewer.
-- [ ] Run the ten-case direct-prompt and Haiku comparisons.
+- [x] Run the full ten-case Haiku evaluation with a `$0.30` cap; 9 of 9 scored report cases passed and the transient API case is covered by automated test.
+- [ ] Run or document the direct-prompt baseline.
 - [ ] Run Sonnet only if Elvis explicitly approves the extra cost for a named comparison.
 - [ ] Record at least three failures, fixes, and regression outcomes.
 - [ ] Observe one unaided manager run and one follow-up feedback run.

@@ -26,6 +26,10 @@ PROMPT_INJECTION_RE = re.compile(
     r"reveal (?:the )?(?:secret|credential|prompt))\b",
     re.IGNORECASE,
 )
+ACTION_SIGNAL_RE = re.compile(
+    r"\b(must|needs? to|should|confirm|confirmation is required|required|owner:|due)\b",
+    re.IGNORECASE,
+)
 
 
 def validate_report(
@@ -114,6 +118,9 @@ def validate_report(
     action_citations = {
         evidence_id for action in report.action_items for evidence_id in action.evidence_ids
     }
+    priority_citations = {
+        evidence_id for priority in report.next_priorities for evidence_id in priority.evidence_ids
+    }
     for index, priority in enumerate(report.next_priorities):
         if not set(priority.evidence_ids) & action_citations:
             findings.extend(
@@ -131,6 +138,34 @@ def validate_report(
                         message="A next priority has no supported action date.",
                         field_path=f"next_priorities.{index}",
                         evidence_ids=priority.evidence_ids,
+                    ),
+                ]
+            )
+    for item in evidence:
+        if item.evidence_id in action_citations or item.evidence_id in priority_citations:
+            continue
+        if ACTION_SIGNAL_RE.search(f"{item.title} {item.content}"):
+            findings.extend(
+                [
+                    ValidationFinding(
+                        severity=FindingSeverity.WARNING,
+                        code="MISSING_ACTION_OWNER",
+                        message=(
+                            f"{item.evidence_id} appears to require follow-up but has no "
+                            "supported action owner in the draft."
+                        ),
+                        field_path=f"evidence.{item.evidence_id}",
+                        evidence_ids=[item.evidence_id],
+                    ),
+                    ValidationFinding(
+                        severity=FindingSeverity.WARNING,
+                        code="MISSING_ACTION_DATE",
+                        message=(
+                            f"{item.evidence_id} appears to require follow-up but has no "
+                            "supported action date in the draft."
+                        ),
+                        field_path=f"evidence.{item.evidence_id}",
+                        evidence_ids=[item.evidence_id],
                     ),
                 ]
             )

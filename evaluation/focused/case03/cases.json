@@ -1,0 +1,33 @@
+[
+  {
+    "case_id": "03-multiple-repositories",
+    "title": "Notes reference two repositories",
+    "period": {"start": "2026-08-31", "end": "2026-09-04"},
+    "evidence": [
+      {
+        "evidence_id": "GH-WEB-22",
+        "source": "github",
+        "title": "Web PR 22",
+        "content": "Merged client dashboard navigation.",
+        "occurred_at": "2026-09-01T10:00:00Z",
+        "metadata": {"repository": "web"}
+      },
+      {
+        "evidence_id": "GH-API-41",
+        "source": "github",
+        "title": "API PR 41",
+        "content": "Merged dashboard permissions endpoint.",
+        "occurred_at": "2026-09-02T10:00:00Z",
+        "metadata": {"repository": "api"}
+      },
+      {
+        "evidence_id": "GDOC-03",
+        "source": "google_doc",
+        "title": "Cross-repository note",
+        "content": "The dashboard release depends on both web navigation and API permissions.",
+        "occurred_at": "2026-09-04T10:00:00Z"
+      }
+    ],
+    "expected_evidence_ids": ["GH-WEB-22", "GH-API-41", "GDOC-03"]
+  }
+]

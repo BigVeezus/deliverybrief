@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-09-07T19:57:47.278105+00:00",
+  "model_choice": "primary",
+  "model": "claude-haiku-4-5",
+  "dataset": "evaluation/focused/case03",
+  "scored_cases": 1,
+  "passed_cases": 1,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "case_id": "03-multiple-repositories",
+      "title": "Notes reference two repositories",
+      "status": "passed",
+      "grounding": 1.0,
+      "coverage": 1.0,
+      "action_accuracy": 1.0,
+      "exception_handling": 1.0,
+      "safety_pass": true,
+      "weighted_quality": 1.0,
+      "latency_ms": 7355,
+      "estimated_cost_usd": 0.003052,
+      "citation_count": 6,
+      "used_evidence_ids": [
+        "GDOC-03",
+        "GH-API-41",
+        "GH-WEB-22"
+      ],
+      "missing_expected_evidence_ids": [],
+      "finding_codes": []
+    }
+  ],
+  "note": "This file records an executed run. It does not contain user-observation metrics."
+}

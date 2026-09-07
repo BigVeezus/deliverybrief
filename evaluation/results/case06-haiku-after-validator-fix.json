@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-09-07T20:08:45.522546+00:00",
+  "model_choice": "primary",
+  "model": "claude-haiku-4-5",
+  "dataset": "evaluation/focused/case06",
+  "scored_cases": 1,
+  "passed_cases": 1,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "case_id": "06-missing-action-fields",
+      "title": "Action has no supported owner or date",
+      "status": "passed",
+      "grounding": 1.0,
+      "coverage": 1.0,
+      "action_accuracy": 1.0,
+      "exception_handling": 1.0,
+      "safety_pass": true,
+      "weighted_quality": 1.0,
+      "latency_ms": 6853,
+      "estimated_cost_usd": 0.002774,
+      "citation_count": 6,
+      "used_evidence_ids": [
+        "GDOC-06",
+        "GH-ISSUE-62"
+      ],
+      "missing_expected_evidence_ids": [],
+      "finding_codes": [
+        "MISSING_ACTION_DATE",
+        "MISSING_ACTION_OWNER"
+      ]
+    }
+  ],
+  "note": "This file records an executed run. It does not contain user-observation metrics."
+}

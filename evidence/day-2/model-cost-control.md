@@ -38,9 +38,9 @@ python -m deliverybrief.evaluation --dataset evaluation/day1 --model primary --e
 Latest conservative Day 1 Haiku estimate:
 
 - Report cases: 3
-- Estimated input tokens: 4,516
+- Estimated input tokens: 4,788
 - Maximum output tokens: 18,000
-- Estimated cost upper bound: $0.094516
+- Estimated cost upper bound: $0.094788
 
 Estimate the full ten-case Haiku evaluation without spending money:
 
@@ -51,9 +51,9 @@ python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --
 Latest conservative full Haiku estimate:
 
 - Report cases: 9
-- Estimated input tokens: 11,066
+- Estimated input tokens: 11,882
 - Maximum output tokens: 54,000
-- Estimated cost upper bound: $0.281066
+- Estimated cost upper bound: $0.281882
 
 Run only if the estimate is under a chosen cap:
 
@@ -62,6 +62,18 @@ python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --
 ```
 
 A test run with a $0.01 cap correctly stopped before model calls.
+
+## Full Haiku result
+
+The final full Haiku evaluation used the same `$0.30` cap and passed:
+
+- Scored report cases: 9
+- Passed report cases: 9
+- Integration contract case: 1 covered by automated test
+- Actual estimated model cost: $0.025316
+- Median latency: 6,444 ms
+
+Result file: `evaluation/results/full-haiku.json`.
 
 ## Current model evidence
 
@@ -76,4 +88,4 @@ Haiku fixed the action-splitting weakness seen in the deterministic demo generat
 
 ## Remaining model work
 
-Before final submission, run the full ten-case evaluation with a small approved budget. Prefer Haiku first. Only run Sonnet if Haiku fails an important case or if a final benchmark comparison is worth the extra spend.
+Before final submission, run or document the direct-prompt baseline. Only run Sonnet if Elvis explicitly approves the extra cost for a named comparison.

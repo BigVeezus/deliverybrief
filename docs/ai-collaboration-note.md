@@ -134,6 +134,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `deliverybrief/evaluation.py`, `deliverybrief/generator.py`, `tests/test_evaluation_workflow.py`, `tests/test_generator.py`, and `evidence/day-2/model-cost-control.md`.
 
+### 7 September 2026 Full Haiku evaluation and regression fixes
+
+**Tool and model.** Codex coding agent, local test suite, and Anthropic Claude Haiku 4.5.
+
+**Delegated work.** I approved running the full Haiku evaluation with a `$0.30` cap after reviewing the local estimate.
+
+**Accepted.** The final full Haiku result passed 9 of 9 scored report cases. The remaining transient API case is covered by an automated integration test. The result cost about `$0.025316` for the nine paid cases.
+
+**Rejected or corrected.** I did not accept the first 8-of-9 result as final. The failing cases led to two fixes: important evidence can no longer remain only in the executive summary, and action-like evidence is now flagged when no action owner or due date appears in the draft.
+
+**Verification.** Focused regressions for case 03 and case 06 passed. The final full Haiku run passed. Pytest, Ruff, and mypy passed after the fixes.
+
+**Decision I owned.** I kept Haiku as the default model because it passed the current full suite at low cost. I kept Sonnet disabled unless a specific comparison is approved later.
+
+**Artifact.** `evaluation/results/full-haiku.json`, `evidence/day-2/full-haiku-evaluation-summary.md`, `deliverybrief/generator.py`, `deliverybrief/evaluation.py`, and `deliverybrief/validator.py`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

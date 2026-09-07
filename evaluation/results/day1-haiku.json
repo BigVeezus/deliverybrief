@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-09-07T19:31:38.923766+00:00",
+  "model_choice": "primary",
+  "model": "claude-haiku-4-5",
+  "dataset": "evaluation/day1",
+  "scored_cases": 3,
+  "passed_cases": 3,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "case_id": "day1-week-b-payment-retry",
+      "title": "Payment retry fix with old queued-job risk",
+      "status": "passed",
+      "grounding": 1.0,
+      "coverage": 1.0,
+      "action_accuracy": 1.0,
+      "exception_handling": 1.0,
+      "safety_pass": true,
+      "weighted_quality": 1.0,
+      "latency_ms": 16473,
+      "estimated_cost_usd": 0.005295,
+      "citation_count": 13,
+      "finding_codes": [
+        "MISSING_ACTION_DATE",
+        "MISSING_ACTION_OWNER",
+        "SOURCE_CONFLICT"
+      ]
+    },
+    {
+      "case_id": "day1-week-c-mobile-contract",
+      "title": "Cross-repository backend contract change stalls mobile work",
+      "status": "passed",
+      "grounding": 1.0,
+      "coverage": 1.0,
+      "action_accuracy": 1.0,
+      "exception_handling": 1.0,
+      "safety_pass": true,
+      "weighted_quality": 1.0,
+      "latency_ms": 14411,
+      "estimated_cost_usd": 0.004583,
+      "citation_count": 12,
+      "finding_codes": [
+        "SOURCE_CONFLICT"
+      ]
+    },
+    {
+      "case_id": "day1-week-d-reporting-migration",
+      "title": "Reporting migration revert with hidden Slack context",
+      "status": "passed",
+      "grounding": 1.0,
+      "coverage": 1.0,
+      "action_accuracy": 1.0,
+      "exception_handling": 1.0,
+      "safety_pass": true,
+      "weighted_quality": 1.0,
+      "latency_ms": 15830,
+      "estimated_cost_usd": 0.005589,
+      "citation_count": 18,
+      "finding_codes": [
+        "MISSING_ACTION_DATE",
+        "MISSING_ACTION_OWNER",
+        "SOURCE_CONFLICT"
+      ]
+    }
+  ],
+  "note": "This file records an executed run. It does not contain user-observation metrics."
+}

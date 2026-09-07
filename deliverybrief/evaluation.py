@@ -149,7 +149,7 @@ def run_evaluation(dataset: Path, model_choice: str) -> dict[str, Any]:
                 }
             )
 
-    scored = [item for item in results if item["status"] in {"passed", "failed"}]
+    scored = [item for item in results if item["status"] in {"passed", "failed", "error"}]
     passed = sum(item["status"] == "passed" for item in scored)
     return {
         "generated_at": datetime.now(UTC).isoformat(),

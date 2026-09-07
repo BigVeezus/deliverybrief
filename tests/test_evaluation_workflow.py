@@ -17,6 +17,50 @@ def test_evaluation_dataset_and_demo_run() -> None:
     assert summary["passed_cases"] >= 9
 
 
+def test_evaluation_errors_count_against_pass_rate(tmp_path, monkeypatch) -> None:
+    cases_dir = tmp_path / "cases"
+    cases_dir.mkdir()
+    (cases_dir / "cases.json").write_text(
+        """
+        [
+          {
+            "case_id": "broken",
+            "title": "Broken generator case",
+            "period": {"start": "2026-08-31", "end": "2026-09-04"},
+            "evidence": [
+              {
+                "evidence_id": "E1",
+                "source": "github",
+                "title": "Evidence",
+                "content": "Merged.",
+                "occurred_at": "2026-09-01T10:00:00Z"
+              }
+            ],
+            "expected_evidence_ids": ["E1"]
+          }
+        ]
+        """,
+        encoding="utf-8",
+    )
+
+    class BrokenGenerator:
+        model = "broken"
+
+        def generate(self, *args, **kwargs):
+            raise RuntimeError("boom")
+
+    import deliverybrief.evaluation as evaluation
+
+    monkeypatch.setattr(evaluation, "DemoReportGenerator", BrokenGenerator)
+
+    summary = evaluation.run_evaluation(cases_dir, "demo")
+
+    assert summary["scored_cases"] == 1
+    assert summary["passed_cases"] == 0
+    assert summary["pass_rate"] == 0.0
+    assert summary["results"][0]["status"] == "error"
+
+
 def test_workflow_records_generated_run(tmp_path) -> None:
     store = RunStore(tmp_path / "runs.db")
     result, record = generate_and_record(

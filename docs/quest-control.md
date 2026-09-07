@@ -22,10 +22,12 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [x] Collect three anonymized reconstructed weekly examples in `evidence/day-1/weekly-examples-index.md`.
 - [x] Record manual time estimates for the three examples in `evidence/day-1/baseline-log.csv`.
 - [x] Run the Day 1 reconstructed examples through `evaluation/day1/cases.json`; result saved to `evaluation/results/day1-demo.json`.
-- [ ] Run one small Anthropic API request and retain the timestamp result without exposing the key.
+- [x] Run Anthropic Haiku on the Day 1 reconstructed examples without exposing the API key; result saved to `evaluation/results/day1-haiku.json`.
+- [x] Record model cost-control policy in `evidence/day-2/model-cost-control.md`.
 - [ ] Verify repository-restricted, read-only GitHub access.
 - [ ] Share one anonymized Google Drive folder with the service account as Viewer.
-- [ ] Run the ten-case direct-prompt, Haiku, and Sonnet comparisons.
+- [ ] Run the ten-case direct-prompt and Haiku comparisons.
+- [ ] Run Sonnet only if Elvis explicitly approves the extra cost for a named comparison.
 - [ ] Record at least three failures, fixes, and regression outcomes.
 - [ ] Observe one unaided manager run and one follow-up feedback run.
 - [ ] Replace draft evidence-boundary sections with measured results.

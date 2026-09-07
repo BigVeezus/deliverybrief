@@ -102,6 +102,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `evaluation/day1/cases.json`, `evaluation/results/day1-demo.json`, and `evidence/day-1/day-1-summary.md`.
 
+### 7 September 2026 Anthropic Day 1 Haiku run and cost cap
+
+**Tool and model.** Codex coding agent, Anthropic Claude Haiku 4.5, and local evaluation command.
+
+**Delegated work.** I asked the agent to run the Day 1 reconstructed examples through Anthropic after adding my API key locally.
+
+**Accepted.** The agent confirmed only that the key was present, without printing it. Haiku passed all three Day 1 reconstructed cases. The result was saved as `evaluation/results/day1-haiku.json`.
+
+**Rejected or corrected.** The first Anthropic call exposed a schema compatibility bug: the structured-output schema needed explicit `additionalProperties: false`. I accepted the code fix and test for that. I also stopped further Sonnet reruns after deciding to cap cost.
+
+**Verification.** Tests, lint, and mypy passed after the schema/evaluator fixes. The Haiku run recorded 3 of 3 cases passed with 100% grounding, coverage, action accuracy, and safety on this small Day 1 dataset.
+
+**Decision I owned.** I chose Haiku as the default evaluation model for now because it passed the Day 1 examples at low cost. Sonnet should only be run again with explicit approval for a named comparison.
+
+**Artifact.** `deliverybrief/generator.py`, `deliverybrief/evaluation.py`, `tests/test_generator.py`, `tests/test_evaluation_workflow.py`, `evaluation/results/day1-haiku.json`, and `evidence/day-2/model-cost-control.md`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

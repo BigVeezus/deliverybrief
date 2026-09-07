@@ -80,7 +80,7 @@ class AnthropicReportGenerator:
         try:
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=3500,
+                max_tokens=6000,
                 system=system,
                 messages=[
                     {
@@ -92,7 +92,7 @@ class AnthropicReportGenerator:
                 output_config={
                     "format": {
                         "type": "json_schema",
-                        "schema": WeeklyReport.model_json_schema(),
+                        "schema": _anthropic_schema(WeeklyReport.model_json_schema()),
                     }
                 },
             )
@@ -132,6 +132,24 @@ def _estimate_cost(model: str, input_tokens: int, output_tokens: int) -> float |
     else:
         return None
     return round((input_tokens * input_rate + output_tokens * output_rate) / 1_000_000, 6)
+
+
+def _anthropic_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """Make a Pydantic JSON schema strict enough for Anthropic structured output."""
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            node_type = node.get("type")
+            if node_type == "object" or "properties" in node:
+                node["additionalProperties"] = False
+            for value in node.values():
+                visit(value)
+        elif isinstance(node, list):
+            for item in node:
+                visit(item)
+
+    visit(schema)
+    return schema
 
 
 OWNER_RE = re.compile(r"Owner:\s*([^.;]+)", re.IGNORECASE)

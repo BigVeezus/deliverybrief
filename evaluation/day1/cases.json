@@ -1,0 +1,119 @@
+[
+  {
+    "case_id": "day1-week-b-payment-retry",
+    "title": "Payment retry fix with old queued-job risk",
+    "period": {"start": "2026-08-31", "end": "2026-09-04"},
+    "evidence": [
+      {
+        "evidence_id": "D1B-GH-PR-58",
+        "source": "github",
+        "title": "PR 58 retry fix",
+        "content": "Open. The PR has no description, so the retry behavior is unclear from GitHub alone.",
+        "occurred_at": "2026-09-01T10:00:00Z",
+        "metadata": {"topic": "payment retry"}
+      },
+      {
+        "evidence_id": "D1B-GH-PR-59",
+        "source": "github",
+        "title": "PR 59 add idempotency key to charge handler",
+        "content": "Merged directly to main without review. Adds an idempotency key for the new charge path. Owner: Developer 2. Due 2026-09-09.",
+        "occurred_at": "2026-09-02T10:00:00Z",
+        "metadata": {"topic": "payment retry"}
+      },
+      {
+        "evidence_id": "D1B-GH-PR-60",
+        "source": "github",
+        "title": "PR 60 wip",
+        "content": "Open. The PR has been open nine days with no commits since day two and is blocked by missing ownership.",
+        "occurred_at": "2026-09-04T10:00:00Z",
+        "metadata": {"topic": "notifications"}
+      },
+      {
+        "evidence_id": "D1B-NOTE-01",
+        "source": "google_doc",
+        "title": "Developer notes for payment retry week",
+        "content": "Risk: old queued jobs may still double-charge on replay. Developer 2 must confirm whether old queued jobs need a manual drain before release. Owner: Developer 2. Due 2026-09-09. Notification work is blocked because it was deprioritized verbally and Client A has not been told. Owner: PM. Due 2026-09-10.",
+        "occurred_at": "2026-09-04T16:00:00Z",
+        "metadata": {"topic": "payment retry"}
+      }
+    ],
+    "expected_evidence_ids": ["D1B-GH-PR-58", "D1B-GH-PR-59", "D1B-GH-PR-60", "D1B-NOTE-01"],
+    "expected_action_owners": ["Developer 2", "PM"],
+    "expected_finding_codes": ["SOURCE_CONFLICT"]
+  },
+  {
+    "case_id": "day1-week-c-mobile-contract",
+    "title": "Cross-repository backend contract change stalls mobile work",
+    "period": {"start": "2026-08-31", "end": "2026-09-04"},
+    "evidence": [
+      {
+        "evidence_id": "D1C-GH-PR-112",
+        "source": "github",
+        "title": "Repo A PR 112 update user response shape",
+        "content": "Merged Tuesday. The PR changed a shared response shape but has no issue link.",
+        "occurred_at": "2026-09-01T13:00:00Z",
+        "metadata": {"topic": "backend contract"}
+      },
+      {
+        "evidence_id": "D1C-GH-PR-77",
+        "source": "github",
+        "title": "Repo B PR 77 profile screen",
+        "content": "Open. CI has failed since Wednesday and mobile work is blocked by the renamed field.",
+        "occurred_at": "2026-09-03T09:00:00Z",
+        "metadata": {"topic": "backend contract"}
+      },
+      {
+        "evidence_id": "D1C-NOTE-01",
+        "source": "google_doc",
+        "title": "Mobile/backend coordination note",
+        "content": "Mobile lost roughly three days because the shared contract change was agreed verbally but not documented. Developer 1 must document the new response shape. Owner: Developer 1. Due 2026-09-08. Tech lead must decide whether contract changes need written sign-off. Owner: Tech lead. Due 2026-09-09.",
+        "occurred_at": "2026-09-04T15:00:00Z",
+        "metadata": {"topic": "backend contract"}
+      }
+    ],
+    "expected_evidence_ids": ["D1C-GH-PR-112", "D1C-GH-PR-77", "D1C-NOTE-01"],
+    "expected_action_owners": ["Developer 1", "Tech lead"],
+    "expected_finding_codes": ["SOURCE_CONFLICT"]
+  },
+  {
+    "case_id": "day1-week-d-reporting-migration",
+    "title": "Reporting migration revert with hidden Slack context",
+    "period": {"start": "2026-08-31", "end": "2026-09-04"},
+    "evidence": [
+      {
+        "evidence_id": "D1D-GH-PR-203",
+        "source": "github",
+        "title": "PR 203 bump deps",
+        "content": "Merged same day. Security dependency patch completed and pushed other migration work back.",
+        "occurred_at": "2026-09-01T11:00:00Z",
+        "metadata": {"topic": "reporting migration"}
+      },
+      {
+        "evidence_id": "D1D-GH-PR-204",
+        "source": "github",
+        "title": "PR 204 new ingest job",
+        "content": "Merged Wednesday. The new ingest job was later reverted after production-volume runtime increased.",
+        "occurred_at": "2026-09-03T12:00:00Z",
+        "metadata": {"topic": "reporting migration"}
+      },
+      {
+        "evidence_id": "D1D-GH-PR-205",
+        "source": "github",
+        "title": "PR 205 revert new ingest job",
+        "content": "Merged Thursday. Revert PR has no explanation in the description.",
+        "occurred_at": "2026-09-04T12:00:00Z",
+        "metadata": {"topic": "reporting migration"}
+      },
+      {
+        "evidence_id": "D1D-NOTE-01",
+        "source": "google_doc",
+        "title": "Reporting migration developer note",
+        "content": "Risk: the migration date is at risk because the new ingest job doubled runtime on production volumes and was reverted to protect the nightly window. Contractor 1 is blocked waiting for staging warehouse read access after two requests. Developer 2 must write up why the ingest job was slow. Owner: Developer 2. Due 2026-09-09. Ops must grant staging access. Owner: Ops. Due 2026-09-08.",
+        "occurred_at": "2026-09-04T17:00:00Z",
+        "metadata": {"topic": "reporting migration"}
+      }
+    ],
+    "expected_evidence_ids": ["D1D-GH-PR-203", "D1D-GH-PR-204", "D1D-GH-PR-205", "D1D-NOTE-01"],
+    "expected_action_owners": ["Developer 2", "Ops"]
+  }
+]

@@ -86,6 +86,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `evidence/day-1/weekly-examples-index.md` and `evidence/day-1/baseline-log.csv`.
 
+### 7 September 2026 Day 1 evaluation smoke test
+
+**Tool and model.** Codex coding agent and deterministic demo generator.
+
+**Delegated work.** I asked the agent to turn the three reconstructed weeks into a separate Day 1 evaluation dataset and run the current demo generator against it.
+
+**Accepted.** The Day 1 dataset was created separately from the official ten-case suite. The smoke test result was recorded even though it failed all three cases.
+
+**Rejected or corrected.** I did not hide the failure. The result shows that the demo generator cites evidence correctly but does not reliably split multiple action owners from one developer note.
+
+**Verification.** I reviewed the executed result: grounding, coverage, and safety were 100% on all three cases, while action-item accuracy was 50% on all three cases.
+
+**Decision I owned.** I will use this as a baseline limitation and compare it against Claude structured-output runs later.
+
+**Artifact.** `evaluation/day1/cases.json`, `evaluation/results/day1-demo.json`, and `evidence/day-1/day-1-summary.md`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

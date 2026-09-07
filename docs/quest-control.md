@@ -6,7 +6,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 
 | Portal slot | Prepared now | Still required before submission |
 |---|---|---|
-| Working System | Public repository, tested local demo, deployed Streamlit URL, and screenshot showing public sharing enabled: https://deliverybrief.streamlit.app/ | Re-test while logged out from a separate browser, incognito window, or phone |
+| Working System | Public repository, tested local demo, deployed Streamlit URL, and phone screenshot showing public access: https://deliverybrief.streamlit.app/ | Repeat one logged-out check before final submission |
 | Evaluation Package | Rendered PDF with method, cases, current engineering results, and evidence boundary | Add direct-prompt, Haiku, Sonnet, target-user timing, edit-rate, and failure-regression results |
 | Case Study | Rendered PDF with scope, title rationale, architecture, choices, and honest current limit | Add observed workflow, screenshots, measured before/after results, and recorded user reaction |
 | AI Collaboration Note | Rendered PDF covering planning, implementation, corrections, and verification | Append live-integration, field-test, hardening, document review, and video-review entries |
@@ -21,6 +21,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [ ] Complete one external target-user interview using `docs/user-interview.md` if time allows.
 - [x] Collect three anonymized reconstructed weekly examples in `evidence/day-1/weekly-examples-index.md`.
 - [x] Record manual time estimates for the three examples in `evidence/day-1/baseline-log.csv`.
+- [x] Run the Day 1 reconstructed examples through `evaluation/day1/cases.json`; result saved to `evaluation/results/day1-demo.json`.
 - [ ] Run one small Anthropic API request and retain the timestamp result without exposing the key.
 - [ ] Verify repository-restricted, read-only GitHub access.
 - [ ] Share one anonymized Google Drive folder with the service account as Viewer.
@@ -30,6 +31,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [ ] Replace draft evidence-boundary sections with measured results.
 - [ ] Add real screenshots and a before/after excerpt to the case study.
 - [ ] Review every sentence in Elvis's own words and rebuild the PDFs.
+- [ ] Rebuild PDFs after Day 1 summary and later measured results are ready.
 - [ ] Record the Loom, test it while logged out, and verify the five-minute limit.
 - [ ] Attach all five deliverables, open each from the portal, and capture the success screen.
 

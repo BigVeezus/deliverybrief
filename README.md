@@ -58,10 +58,11 @@ The model names are configuration rather than code constants. This keeps the eva
 Run:
 
 ```bash
-python -m deliverybrief.evaluation --dataset evaluation/cases
+python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --estimate-only
+python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --max-estimated-cost-usd 0.30
 ```
 
-The repository contains ten labeled cases, expected behavior, deterministic checks, and an output location for measured results. Results that require Claude, a live user, or production credentials are not pre-filled. See `docs/evaluation-package.md` for the method and `docs/evidence-needed.md` for the remaining evidence checklist.
+The repository contains ten labeled cases, expected behavior, deterministic checks, and an output location for measured results. The latest capped Haiku run passed 9 of 9 scored report cases; the transient API case is covered by an automated integration test. The nine paid cases cost an estimated $0.025316. See `docs/evaluation-package.md` for the method and `docs/evidence-needed.md` for the remaining evidence checklist.
 
 ## Important limits
 

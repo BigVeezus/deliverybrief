@@ -6,11 +6,11 @@ I built DeliveryBrief to test whether a delivery manager can prepare a weekly cl
 
 ## Baselines
 
-The previous-workflow baseline uses three anonymized real weeks. For each week, the manager follows the existing process while I record time spent collecting, drafting, verifying, correcting, and approving. I also count source switches, omissions found during review, and changes before sending.
+The previous-workflow baseline uses three anonymized reconstructed weeks from real operating patterns. I recorded manual preparation estimates for each week: 55 minutes for the payment retry week, 75 minutes for the mobile/backend contract week, and 40 minutes for the reporting migration week. The median manual preparation estimate is 55 minutes.
 
-The direct-model baseline runs all ten frozen cases through one Claude prompt without source adapters, stable evidence IDs, deterministic validation, or approval rules. This comparison isolates the value of the system around the model.
+The deterministic demo baseline runs the same Day 1 reconstructed weeks without Anthropic. It is intentionally simple and exists so the public demo can run without credentials or cost. It failed the three harder Day 1 examples because it did not reliably split multiple action owners from one developer note.
 
-The final comparison runs the same cases through Haiku, Sonnet, and the validated DeliveryBrief workflow. Result files must record the model ID, prompt version, timestamp, token use, latency, and cost configuration.
+The direct-model baseline still needs to be run or documented. I did not run a full Sonnet benchmark because Elvis asked to cap cost after the first partial Sonnet attempt. Sonnet remains available only if a specific comparison is worth the extra spend.
 
 ## Measures and reasons
 
@@ -56,17 +56,35 @@ These thresholds are intentionally strict for grounding and safety because a wro
 
 ## Current executable evidence
 
-The repository includes the ten-case manifest, deterministic validators, export tests, storage tests, and a mocked GitHub retry contract. Running `python -m deliverybrief.evaluation --dataset evaluation/cases --model demo` produces a timestamped result rather than a prewritten score.
+The repository includes the ten-case manifest, deterministic validators, export tests, storage tests, a mocked GitHub retry contract, and Anthropic cost controls.
 
-## Results to insert after execution
+Cost control was added before the full paid run. `--estimate-only` gives a local upper-bound estimate with no Anthropic API call. `--max-estimated-cost-usd` stops the command before model calls if the estimate is above the approved cap.
 
-The final package must include the generated result filenames, aggregate table, per-case table, baseline timings, user edit rate, model selection, and screenshots from the failed and corrected runs. Do not replace missing results with targets.
+## Results so far
+
+| Run | Dataset | Model | Result | Cost |
+| --- | --- | --- | --- | --- |
+| Day 1 demo baseline | `evaluation/day1` | deterministic demo | 0 of 3 passed | $0 |
+| Day 1 Haiku | `evaluation/day1` | `claude-haiku-4-5` | 3 of 3 passed | $0.015467 |
+| Full Haiku estimate | `evaluation/cases` | `claude-haiku-4-5` | estimate only, no API call | upper bound $0.281882 |
+| Full Haiku final | `evaluation/cases` | `claude-haiku-4-5` | 9 of 9 scored report cases passed; case 09 covered by integration test | $0.025316 |
+
+Full Haiku result file: `evaluation/results/full-haiku.json`.
+
+The final full Haiku run recorded 100 percent grounding, 100 percent coverage, 100 percent action accuracy, 100 percent exception handling, and safety pass across all scored report cases. Median latency was 6,444 ms.
 
 ## Required failure analysis
 
-For at least three failures, record the observed behavior, affected case, root cause, why the design allowed it, the change made, regression result, and remaining limitation.
+Three useful failures have already been recorded:
+
+| Failure | Root cause | Change made | Regression result |
+| --- | --- | --- | --- |
+| Anthropic rejected the structured-output schema | Pydantic schema did not explicitly set `additionalProperties: false` for every object | Added strict schema conversion before Anthropic calls and test coverage | Anthropic Haiku ran successfully after the fix |
+| Case 03 missed one cross-repository evidence item | The prompt allowed important evidence to appear only in the executive summary, which did not count as substantive coverage | Prompt now requires important evidence in a report section or action item; evaluator reports missing evidence IDs | Focused case 03 passed |
+| Case 06 allowed action-like evidence to disappear | The model could avoid creating an action when owner/date were missing, so the validator had nothing to warn about | Validator now flags action-like evidence with missing owner/date when it is not tied to an action or next priority | Focused case 06 passed; final full Haiku run passed |
 
 ## Limits
 
-The first evaluation covers one project, one manager, and ten cases. Pattern-based privacy checks can produce false positives. A read-only integration reduces source risk but does not prove the client wording is correct. The manager remains the final approver.
+The first evaluation covers one project shape and ten cases. Pattern-based privacy checks can produce false positives. A read-only integration reduces source risk but does not prove the client wording is correct. The manager remains the final approver.
 
+Remaining evidence needed before final PDF submission: direct-prompt baseline, target-user run/edit observations, live GitHub/Google credential check if used, final screenshots, and final document review.

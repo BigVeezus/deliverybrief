@@ -5,6 +5,9 @@ from datetime import UTC, date, datetime
 from deliverybrief.models import EvidenceItem, ReportingPeriod, SourceType
 
 DEMO_PERIOD = ReportingPeriod(start=date(2026, 8, 31), end=date(2026, 9, 4))
+SAMPLE_SOURCE_URL = (
+    "https://github.com/BigVeezus/deliverybrief/blob/main/deliverybrief/demo_data.py"
+)
 
 
 def demo_evidence() -> list[EvidenceItem]:
@@ -18,7 +21,7 @@ def demo_evidence() -> list[EvidenceItem]:
                 "Automated tests passed."
             ),
             occurred_at=datetime(2026, 9, 2, 14, 10, tzinfo=UTC),
-            source_url="https://github.com/deliverybrief/demo/pull/142",
+            source_url=SAMPLE_SOURCE_URL,
             author_alias="Engineer A",
             metadata={
                 "kind": "pull_request",
@@ -36,7 +39,7 @@ def demo_evidence() -> list[EvidenceItem]:
                 "updated on 2026-09-03."
             ),
             occurred_at=datetime(2026, 9, 3, 11, 30, tzinfo=UTC),
-            source_url="https://github.com/deliverybrief/demo/issues/87",
+            source_url=SAMPLE_SOURCE_URL,
             author_alias="Engineer B",
             metadata={
                 "kind": "issue",
@@ -51,7 +54,7 @@ def demo_evidence() -> list[EvidenceItem]:
             title="Weekly delivery notes 4 September",
             content=("Invoice export filters were demonstrated and accepted."),
             occurred_at=datetime(2026, 9, 4, 9, 0, tzinfo=UTC),
-            source_url="https://docs.google.com/document/d/demo-weekly-delivery",
+            source_url=SAMPLE_SOURCE_URL,
             author_alias="Delivery Manager",
             metadata={"kind": "meeting_notes", "topic": "invoice export filters"},
         ),
@@ -64,7 +67,7 @@ def demo_evidence() -> list[EvidenceItem]:
                 "names by 2026-09-08. Owner: Client Product Lead."
             ),
             occurred_at=datetime(2026, 9, 4, 9, 5, tzinfo=UTC),
-            source_url="https://docs.google.com/document/d/demo-weekly-delivery",
+            source_url=SAMPLE_SOURCE_URL,
             author_alias="Delivery Manager",
             metadata={"kind": "meeting_notes", "topic": "bulk upload validation"},
         ),
@@ -77,7 +80,7 @@ def demo_evidence() -> list[EvidenceItem]:
                 "final validation of bulk upload error messages. Owner: QA Lead. Due 2026-09-07."
             ),
             occurred_at=datetime(2026, 9, 4, 9, 15, tzinfo=UTC),
-            source_url="https://docs.google.com/document/d/demo-weekly-risk",
+            source_url=SAMPLE_SOURCE_URL,
             author_alias="Delivery Manager",
             metadata={"kind": "risk_note", "topic": "bulk upload error messages"},
         ),

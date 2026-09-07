@@ -80,6 +80,8 @@ The repository contains ten labeled cases, expected behavior, deterministic chec
 - [AI collaboration note](docs/ai-collaboration-note.md)
 - [User interview guide](docs/user-interview.md)
 - [Five-minute demo script](docs/demo-script.md)
+- [Quest control sheet](docs/quest-control.md)
+- [Deadline confirmation email](docs/deadline-confirmation-email.md)
 - [Evaluation Package PDF](output/pdf/DeliveryBrief-Evaluation-Package.pdf)
 - [Case Study PDF](output/pdf/DeliveryBrief-Case-Study.pdf)
 - [AI Collaboration Note PDF](output/pdf/DeliveryBrief-AI-Collaboration-Note.pdf)

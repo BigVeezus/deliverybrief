@@ -66,12 +66,15 @@ Cost control was added before the full paid run. `--estimate-only` gives a local
 | --- | --- | --- | --- | --- |
 | Day 1 demo baseline | `evaluation/day1` | deterministic demo | 0 of 3 passed | $0 |
 | Day 1 Haiku | `evaluation/day1` | `claude-haiku-4-5` | 3 of 3 passed | $0.015467 |
+| Direct-prompt Haiku | `evaluation/cases` | `claude-haiku-4-5` | 1 of 9 scored report cases passed | $0.007295 |
 | Full Haiku estimate | `evaluation/cases` | `claude-haiku-4-5` | estimate only, no API call | upper bound $0.281882 |
 | Full Haiku final | `evaluation/cases` | `claude-haiku-4-5` | 9 of 9 scored report cases passed; case 09 covered by integration test | $0.025316 |
 
 Full Haiku result file: `evaluation/results/full-haiku.json`.
 
 The final full Haiku run recorded 100 percent grounding, 100 percent coverage, 100 percent action accuracy, 100 percent exception handling, and safety pass across all scored report cases. Median latency was 6,444 ms.
+
+The direct-prompt baseline used the same Haiku model without DeliveryBrief's evidence IDs, structured-output schema, deterministic validation, approval gate, or export/run record. It produced readable prose in several cases, but only 1 of 9 scored cases passed the automated audit. The main lesson is not that the model cannot summarize; it is that a direct prompt is hard to verify reliably.
 
 ## Required failure analysis
 
@@ -87,7 +90,7 @@ Three useful failures have already been recorded:
 
 The first evaluation covers one project shape and ten cases. Pattern-based privacy checks can produce false positives. A read-only integration reduces source risk but does not prove the client wording is correct. The manager remains the final approver.
 
-Remaining evidence needed before final PDF submission: direct-prompt baseline, target-user run/edit observations, live GitHub/Google credential check if used, final screenshots, and final document review.
+Remaining evidence needed before final PDF submission: target-user run/edit observations if time allows, live GitHub/Google credential check if used, final screenshots, and final document review.
 
 ## App-run evidence
 

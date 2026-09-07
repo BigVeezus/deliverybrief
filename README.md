@@ -62,7 +62,7 @@ python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --
 python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --max-estimated-cost-usd 0.30
 ```
 
-The repository contains ten labeled cases, expected behavior, deterministic checks, and an output location for measured results. The latest capped Haiku run passed 9 of 9 scored report cases; the transient API case is covered by an automated integration test. The nine paid cases cost an estimated $0.025316. See `docs/evaluation-package.md` for the method and `docs/evidence-needed.md` for the remaining evidence checklist.
+The repository contains ten labeled cases, expected behavior, deterministic checks, and an output location for measured results. The direct-prompt Haiku baseline passed 1 of 9 scored report cases under automated audit. The latest capped DeliveryBrief Haiku run passed 9 of 9 scored report cases; the transient API case is covered by an automated integration test. The nine paid DeliveryBrief cases cost an estimated $0.025316. See `docs/evaluation-package.md` for the method and `docs/evidence-needed.md` for the remaining evidence checklist.
 
 ## Important limits
 

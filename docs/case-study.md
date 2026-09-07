@@ -70,6 +70,8 @@ The full Haiku run recorded:
 - estimated model cost: $0.025316
 - median latency: 6,444 ms
 
+I also ran a direct-prompt Haiku baseline without DeliveryBrief's evidence IDs, schema enforcement, validation, approval gate, or export record. It passed 1 of 9 scored report cases under the automated audit and cost $0.007295. Several outputs were readable, but they were harder to verify because the final text did not preserve stable evidence handling.
+
 The time-reduction result is not final yet because I still need an observed user run through the interface and an edit-rate measurement.
 
 ## User response

@@ -28,7 +28,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [ ] Verify repository-restricted, read-only GitHub access.
 - [ ] Share one anonymized Google Drive folder with the service account as Viewer.
 - [x] Run the full ten-case Haiku evaluation with a `$0.30` cap; 9 of 9 scored report cases passed and the transient API case is covered by automated test.
-- [ ] Run or document the direct-prompt baseline.
+- [x] Run direct-prompt Haiku baseline with a `$0.07` cap; result saved to `evaluation/results/direct-prompt-haiku.json`.
 - [ ] Run Sonnet only if Elvis explicitly approves the extra cost for a named comparison.
 - [x] Record at least three failures, fixes, and regression outcomes in the Evaluation Package and Case Study source docs.
 - [ ] Observe one unaided manager run and one follow-up feedback run.

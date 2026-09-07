@@ -166,6 +166,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `evidence/day-2/app-run-summary.md` and files under `evidence/day-2/app-run/`.
 
+### 7 September 2026 Direct-prompt baseline
+
+**Tool and model.** Codex coding agent and Anthropic Claude Haiku 4.5.
+
+**Delegated work.** I asked the agent to run a direct-prompt baseline after the capped DeliveryBrief Haiku evaluation passed.
+
+**Accepted.** The direct baseline ran with a `$0.07` cap and saved results to `evaluation/results/direct-prompt-haiku.json`. It cost about `$0.007295` and passed 1 of 9 scored report cases under the automated audit.
+
+**Rejected or corrected.** I did not describe the result as proof that Haiku cannot write useful prose. The result is documented as an auditability gap: direct prompting lacks stable evidence IDs, structured output, deterministic validation, approval controls, and export records.
+
+**Verification.** The result file includes per-case excerpts, scoring details, and estimated cost. The comparison was added to the Evaluation Package and Case Study sources.
+
+**Decision I owned.** I chose to use this result to explain why DeliveryBrief adds workflow structure around the model instead of only calling Claude.
+
+**Artifact.** `scripts/run_direct_prompt_baseline.py`, `evaluation/results/direct-prompt-haiku.json`, and `evidence/day-2/direct-prompt-baseline-summary.md`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

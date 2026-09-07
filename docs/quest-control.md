@@ -16,8 +16,9 @@ Use this as the single checklist for the active Quest. Evidence links and result
 
 - [x] Deadline confirmation requested; Erwin confirmed on 7 September 2026 that the Quest timer is active, but did not provide an exact timestamp deadline in the reply.
 - [x] Record the approximate Quest acceptance time: Monday, 7 September 2026 at 3:00 PM WAT.
-- [ ] Re-test https://deliverybrief.streamlit.app/ while logged out from a separate browser, incognito window, or phone.
-- [ ] Complete one target-user interview using `docs/user-interview.md`.
+- [x] Re-test https://deliverybrief.streamlit.app/ while logged out from a phone; screenshot saved in `evidence/day-1/screenshots/mobile-public-url.png`.
+- [x] Record Elvis-provided target-user perspective in `evidence/day-1/interview-notes-elvis-proxy.md`.
+- [ ] Complete one external target-user interview using `docs/user-interview.md` if time allows.
 - [ ] Collect three anonymized weekly input/output examples with consent.
 - [ ] Measure the manual workflow for those three weeks.
 - [ ] Run one small Anthropic API request and retain the timestamp result without exposing the key.

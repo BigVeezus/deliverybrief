@@ -54,6 +54,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `docs/quest-control.md`.
 
+### 7 September 2026 Target-user perspective cleanup
+
+**Tool and model.** Codex coding agent.
+
+**Delegated work.** I gave the agent rough answers from the viewpoint of a project/product manager who sends weekly updates to an MD. I asked it to make the answers clearer and easier to use as Day 1 evidence.
+
+**Accepted.** The cleaned note states the workflow, sources, bottleneck, trust conditions, rejection conditions, and examples of information that should not reach a client or MD.
+
+**Rejected or corrected.** I did not present this as a fake external interview. It is recorded as Elvis-provided target-user perspective, with a note that a separate external interview is still useful if time allows.
+
+**Verification.** I checked that the note reflects the supplied answers: weekly MD updates, GitHub PRs, developer notes, vague commits, document quality, context handling, consistency, and formatting.
+
+**Decision I owned.** I chose to use this as Day 1 proxy evidence while keeping the limitation visible.
+
+**Artifact.** `evidence/day-1/interview-notes-elvis-proxy.md`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

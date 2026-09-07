@@ -13,7 +13,8 @@ from docx.shared import Inches, Pt, RGBColor
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCX_DIR = ROOT / "output" / "docx"
-RESULT_PATH = ROOT / "evaluation" / "results" / "demo-latest.json"
+RESULT_PATH = ROOT / "evaluation" / "results" / "full-haiku.json"
+DIRECT_RESULT_PATH = ROOT / "evaluation" / "results" / "direct-prompt-haiku.json"
 NAVY = "275D7A"
 PALE_BLUE = "EFF5F8"
 LIGHT_GRAY = "D9D9D9"
@@ -196,19 +197,20 @@ def save(document: Document, filename: str) -> None:
 
 def build_evaluation() -> None:
     results = json.loads(RESULT_PATH.read_text(encoding="utf-8"))
+    direct_results = json.loads(DIRECT_RESULT_PATH.read_text(encoding="utf-8"))
     document = base_document(
         "DeliveryBrief Evaluation Package",
-        "Method, executable checks, current results and evidence still required",
+        "Method, capped model results, regressions and remaining evidence",
         "Evaluation package",
     )
     add_heading(document, "Current conclusion")
     add_paragraph(
         document,
-        "The implementation currently passes twelve automated tests and all nine report cases in the "
-        "deterministic demo harness. The tenth case is a mocked retry contract. These results verify "
-        "the software paths described here. They do not prove time savings, live model quality or "
-        "adoption. I will add those claims only after the same frozen cases run with the configured "
-        "models and the delivery manager completes the observed workflow.",
+        "The capped DeliveryBrief Haiku workflow passed all nine scored report cases. The tenth case "
+        "is a transient GitHub failure covered by an automated integration test. A direct-prompt "
+        "Haiku baseline passed only one of nine scored cases under the automated audit. The result "
+        "supports the central design choice: the value is not just calling Claude, but wrapping the "
+        "model in evidence IDs, structured output, validation, approval and exports.",
     )
     add_heading(document, "Evaluation question")
     add_paragraph(
@@ -224,7 +226,7 @@ def build_evaluation() -> None:
         [
             [
                 "Automated tests",
-                "12 passed",
+                "18 passed",
                 "Core generators, validators, exports, storage and retry behavior",
             ],
             [
@@ -233,9 +235,14 @@ def build_evaluation() -> None:
                 "Current Python source meets configured lint and type checks",
             ],
             [
-                "Demo report cases",
+                "DeliveryBrief Haiku",
                 f"{results['passed_cases']} of {results['scored_cases']} passed",
-                "Deterministic sample behavior against the frozen manifest",
+                "Validated workflow against the frozen manifest",
+            ],
+            [
+                "Direct-prompt Haiku",
+                f"{direct_results['passed_cases']} of {direct_results['scored_cases']} passed",
+                "Same model without stable evidence IDs or validation",
             ],
             [
                 "Transient API case",
@@ -248,32 +255,31 @@ def build_evaluation() -> None:
     add_heading(document, "Evidence boundary")
     add_paragraph(
         document,
-        "The public demo uses labeled sample evidence. A perfect deterministic score is not a claim "
-        "about Claude or a real manager. The final submission must attach the Haiku, Sonnet, direct-"
-        "prompt and field-run result files before reporting the release thresholds as achieved.",
+        "The public demo uses labeled sample evidence. The model evaluation uses frozen cases, not "
+        "a broad production sample. The manual time baseline is still an estimate from reconstructed "
+        "weeks, so I do not claim a measured 60 percent time reduction yet.",
     )
 
-    page_break(document)
     add_heading(document, "Baselines and comparison")
     add_heading(document, "Previous workflow", level=2)
     add_paragraph(
         document,
-        "For three anonymized real weeks, the manager follows the existing process while I record "
-        "collection, drafting, verification, correction and approval time. I also count source "
-        "switches, omissions and changes before sending.",
+        "Three anonymized reconstructed weeks from real operating patterns estimate manual prep at "
+        "55 minutes, 75 minutes and 40 minutes. The median manual preparation estimate is 55 "
+        "minutes.",
     )
     add_heading(document, "Direct model baseline", level=2)
     add_paragraph(
         document,
-        "All ten frozen cases run through one Claude prompt without stable evidence IDs, source "
-        "adapters, deterministic validation or approval controls. This isolates the value supplied "
-        "by the workflow around the model.",
+        "The direct-prompt Haiku baseline used a normal freeform prompt with the raw inputs. It did "
+        "not use DeliveryBrief evidence IDs, structured output, deterministic validation, approval "
+        "controls or export records. It passed 1 of 9 scored report cases and cost $0.007295.",
     )
     add_heading(document, "Final workflow", level=2)
     add_paragraph(
         document,
-        "The same cases run through Haiku, Sonnet and the validated workflow. Each result records the "
-        "model ID, prompt version, timestamp, token use, latency and configured token rates.",
+        "The validated DeliveryBrief Haiku workflow passed 9 of 9 scored report cases with case 09 "
+        "covered by an integration test. The run used a $0.30 estimate cap and cost $0.025316.",
     )
     add_heading(document, "Measures and reasons")
     add_table(
@@ -349,30 +355,45 @@ def build_evaluation() -> None:
 
     page_break(document)
     add_heading(document, "Failure analysis and remaining work")
-    add_heading(document, "Required failure record", level=2)
-    add_paragraph(
+    add_heading(document, "Executed failure record", level=2)
+    add_table(
         document,
-        "For at least three executed failures I will record the observed behavior, affected case, "
-        "root cause, reason the original design allowed it, change made, regression result and "
-        "remaining limitation. Each record will link to a test or result file.",
+        ["Failure", "Change made", "Regression result"],
+        [
+            [
+                "Anthropic rejected the Pydantic schema",
+                "Strict schema conversion added",
+                "Haiku structured output ran successfully",
+            ],
+            [
+                "Case 03 missed cross-repository evidence",
+                "Prompt requires important evidence in scored sections",
+                "Focused case 03 passed",
+            ],
+            [
+                "Case 06 action-like evidence disappeared",
+                "Validator flags missing owner/date from action-like evidence",
+                "Focused case 06 and full Haiku passed",
+            ],
+        ],
+        [2.0, 2.4, 2.25],
     )
     add_heading(document, "Evidence still required", level=2)
     add_bullets(
         document,
         [
-            "Three measured manual workflow runs and the manager's edit record",
-            "Ten direct-prompt baseline outputs",
-            "Haiku and Sonnet runs over the frozen cases",
-            "One unaided user run and Day 4 feedback",
-            "Final model decision, cost, latency and regression table",
+            "One external target-user run or review if time allows",
+            "Final screenshots for loaded evidence, report, approval and exports",
+            "Final PDF visual review after this rebuild",
+            "A short Loom video showing the public app and one safe failure",
         ],
     )
     add_heading(document, "Current limits", level=2)
     add_paragraph(
         document,
-        "The first evaluation covers one project, one manager and ten cases. Pattern checks can "
-        "produce false positives. Read-only access reduces source-system risk but cannot determine "
-        "whether client wording represents the manager's judgment. The manager remains the approver.",
+        "The first evaluation covers one project shape and ten cases. Pattern checks can produce "
+        "false positives. Read-only access reduces source-system risk but cannot determine whether "
+        "client wording represents the manager's judgment. The manager remains the approver.",
     )
     save(document, "DeliveryBrief-Evaluation-Package.docx")
 
@@ -408,10 +429,9 @@ def build_case_study() -> None:
     add_heading(document, "Evidence status")
     add_paragraph(
         document,
-        "The software and sample workflow are implemented. The target-user interview, three manual "
-        "baselines and live model comparison must be completed before the final case study claims an "
-        "operational improvement. I separated that missing evidence rather than converting targets "
-        "into results.",
+        "The software, public Streamlit app, Day 1 reconstructed weeks, direct-prompt baseline, "
+        "capped Haiku evaluation and public app-run exports are complete. I still separate these "
+        "from a measured time-savings claim because the app run used sample evidence.",
     )
 
     page_break(document)
@@ -503,32 +523,33 @@ def build_case_study() -> None:
     add_heading(document, "Current engineering evidence", level=2)
     add_paragraph(
         document,
-        "Twelve automated tests pass. Ruff and mypy pass. The deterministic harness passes nine report "
-        "cases, while the transient GitHub failure is covered by a mocked retry test. These results "
-        "verify implementation behavior only; they do not replace the field evaluation.",
+        "Eighteen automated tests pass. Ruff, mypy and the secret scan pass. The capped DeliveryBrief "
+        "Haiku workflow passed 9 of 9 scored report cases, while the transient GitHub failure is "
+        "covered by a mocked retry test.",
     )
     add_heading(document, "Failure evidence to add", level=2)
     add_paragraph(
         document,
-        "The final version will include three executed failures, the reason each occurred, the code "
-        "or prompt change, the regression result and the remaining limitation. I will state any "
-        "release threshold that the system misses.",
+        "Three failures changed the system: Anthropic schema rejection, missing cross-repository "
+        "evidence and disappearing action-like evidence. I fixed each issue and reran focused or "
+        "full regressions before recording the final Haiku result.",
     )
 
     page_break(document)
     add_heading(document, "Results and adoption")
     add_paragraph(
         document,
-        "The final results section will use frozen files for time reduction, grounding, coverage, "
-        "action accuracy, cost, latency and edit rate. Only recorded manager feedback will be quoted. "
-        "The public sample will remain labeled separately.",
+        "The direct-prompt baseline passed 1 of 9 scored cases and cost $0.007295. The DeliveryBrief "
+        "Haiku workflow passed 9 of 9 scored report cases and cost $0.025316. The app-run evidence "
+        "shows that Elvis approved and exported a sample report from the public Streamlit app. The "
+        "public sample remains labeled separately from field evidence.",
     )
     add_heading(document, "Main current limitation")
     add_paragraph(
         document,
-        "The implementation has not yet been exercised with the target manager's anonymized weekly "
-        "records. Until that happens, it is a working system with engineering evidence rather than "
-        "proof that the manager's workflow improved.",
+        "The implementation has not yet been timed with a second target manager using their own "
+        "anonymized weekly records. Until that happens, it is a working system with strong "
+        "engineering evidence rather than broad adoption evidence.",
     )
     add_heading(document, "Next two weeks")
     add_bullets(
@@ -625,12 +646,43 @@ def build_collaboration_note() -> None:
         "manager session and review every final statement before submission.",
         "Decision I owned.",
     )
+    add_heading(document, "7 September evaluation and cost control")
+    add_paragraph(document, "Tool and model. Codex coding agent and Claude Haiku 4.5.", "Tool and model.")
+    add_paragraph(
+        document,
+        "Delegated work. I asked the agent to run capped model evaluations, compare the direct-prompt "
+        "baseline with the DeliveryBrief workflow and stop Sonnet unless I explicitly approved more "
+        "spend.",
+        "Delegated work.",
+    )
+    add_paragraph(
+        document,
+        "Accepted. The direct-prompt Haiku baseline passed 1 of 9 scored cases. The DeliveryBrief "
+        "Haiku workflow passed 9 of 9 scored report cases with a $0.30 cap and an actual estimated "
+        "cost of $0.025316.",
+        "Accepted.",
+    )
+    add_paragraph(
+        document,
+        "Rejected or corrected. I did not accept the first 8-of-9 result as final. The failed cases "
+        "led to fixes for strict Anthropic schemas, cross-repository evidence coverage and missing "
+        "action-like evidence.",
+        "Rejected or corrected.",
+    )
+    add_paragraph(
+        document,
+        "Verification. Focused regressions passed, the final full Haiku run passed, and tests, Ruff, "
+        "mypy and the secret scan passed.",
+        "Verification.",
+    )
     add_heading(document, "Artifacts")
     add_bullets(
         document,
         [
             "Typed application and integration code",
-            "Ten-case evaluation manifest and timestamped demo result",
+            "Ten-case evaluation manifest and capped Haiku result",
+            "Direct-prompt baseline result",
+            "Public app-run exports and screenshot",
             "Automated tests and static-analysis configuration",
             "Decision record, runbook and submission-document sources",
         ],
@@ -649,9 +701,7 @@ def build_collaboration_note() -> None:
         document,
         [
             "Live credential and integration verification",
-            "Prompt revisions after the first Haiku and Sonnet runs",
-            "Changes made after the manager's unaided test",
-            "Failure analysis and regression work",
+            "Changes made after any external manager review",
             "Final document and demo-video review",
         ],
     )

@@ -54,7 +54,10 @@ def load_settings() -> Settings:
         github_token=os.getenv("GITHUB_TOKEN") or None,
         google_service_account_json=os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON") or None,
         database_path=Path(os.getenv("DELIVERYBRIEF_DB_PATH", "deliverybrief.db")),
-        repository_url=os.getenv("DELIVERYBRIEF_REPOSITORY_URL", "").strip(),
+        repository_url=os.getenv(
+            "DELIVERYBRIEF_REPOSITORY_URL",
+            "https://github.com/BigVeezus/deliverybrief",
+        ).strip(),
         project=project,
     )
 

@@ -9,7 +9,11 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from deliverybrief.config import load_settings
-from deliverybrief.generator import AnthropicReportGenerator, DemoReportGenerator
+from deliverybrief.generator import (
+    AnthropicReportGenerator,
+    DemoReportGenerator,
+    estimate_generation_cost,
+)
 from deliverybrief.models import (
     EvidenceItem,
     ProjectConfig,
@@ -164,12 +168,76 @@ def run_evaluation(dataset: Path, model_choice: str) -> dict[str, Any]:
     }
 
 
+def estimate_evaluation_cost(dataset: Path, model_choice: str) -> dict[str, Any]:
+    settings = load_settings()
+    cases = [case for case in load_cases(dataset) if case.case_type == "report"]
+    project = ProjectConfig()
+    if model_choice == "demo":
+        model = "deterministic-demo-v1"
+    else:
+        model = settings.primary_model if model_choice == "primary" else settings.quality_model
+
+    estimates = [
+        estimate_generation_cost(model, project, case.period, case.evidence) for case in cases
+    ]
+    input_tokens = sum(item.input_tokens for item in estimates)
+    output_tokens = sum(item.output_tokens for item in estimates)
+    estimated_costs = [item.estimated_cost_usd for item in estimates]
+    total_cost = (
+        round(sum(cost for cost in estimated_costs if cost is not None), 6)
+        if all(cost is not None for cost in estimated_costs)
+        else None
+    )
+    return {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "model_choice": model_choice,
+        "model": model,
+        "dataset": str(dataset),
+        "report_cases": len(cases),
+        "estimated_input_tokens": input_tokens,
+        "max_output_tokens": output_tokens,
+        "estimated_cost_upper_bound_usd": total_cost,
+        "note": (
+            "This is a local conservative estimate. It makes no Anthropic API call and assumes "
+            "each report uses the configured max output tokens."
+        ),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate DeliveryBrief against its case set")
     parser.add_argument("--dataset", type=Path, default=Path("evaluation/cases"))
     parser.add_argument("--model", choices=["demo", "primary", "quality"], default="demo")
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--estimate-only",
+        action="store_true",
+        help="Estimate maximum Anthropic cost locally without making API calls.",
+    )
+    parser.add_argument(
+        "--max-estimated-cost-usd",
+        type=float,
+        help="Abort before model calls if the local cost estimate exceeds this amount.",
+    )
     args = parser.parse_args()
+    if args.estimate_only:
+        estimate = estimate_evaluation_cost(args.dataset, args.model)
+        if args.output is not None:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(estimate, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps(estimate, indent=2))
+        return
+
+    if args.max_estimated_cost_usd is not None:
+        estimate = estimate_evaluation_cost(args.dataset, args.model)
+        estimated_cost = estimate["estimated_cost_upper_bound_usd"]
+        if estimated_cost is not None and estimated_cost > args.max_estimated_cost_usd:
+            raise SystemExit(
+                "Estimated cost upper bound "
+                f"${estimated_cost:.6f} exceeds cap ${args.max_estimated_cost_usd:.6f}. "
+                "Run with a higher cap only if Elvis approves it."
+            )
+
     summary = run_evaluation(args.dataset, args.model)
     output = args.output
     if output is None:

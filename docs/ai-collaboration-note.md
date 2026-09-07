@@ -118,6 +118,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `deliverybrief/generator.py`, `deliverybrief/evaluation.py`, `tests/test_generator.py`, `tests/test_evaluation_workflow.py`, `evaluation/results/day1-haiku.json`, and `evidence/day-2/model-cost-control.md`.
 
+### 7 September 2026 Cost-estimation controls
+
+**Tool and model.** Codex coding agent.
+
+**Delegated work.** I asked whether the evaluation cost could be checked before running paid model calls.
+
+**Accepted.** The evaluation command now supports `--estimate-only` for a zero-cost local estimate and `--max-estimated-cost-usd` to stop before calling Anthropic when the estimate is above the approved cap.
+
+**Rejected or corrected.** I did not rely on memory or manual discipline as the only cost control. The estimator and cap are implemented in code and covered by tests.
+
+**Verification.** The Day 1 Haiku estimate ran without an API call. The full Haiku estimate ran without an API call. A test command with a $0.01 cap stopped before any paid run. Pytest, Ruff, and mypy passed.
+
+**Decision I owned.** I chose to require an estimate before future paid evaluation runs and to keep Sonnet gated behind explicit approval.
+
+**Artifact.** `deliverybrief/evaluation.py`, `deliverybrief/generator.py`, `tests/test_evaluation_workflow.py`, `tests/test_generator.py`, and `evidence/day-2/model-cost-control.md`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

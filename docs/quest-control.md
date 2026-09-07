@@ -24,6 +24,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [x] Run the Day 1 reconstructed examples through `evaluation/day1/cases.json`; result saved to `evaluation/results/day1-demo.json`.
 - [x] Run Anthropic Haiku on the Day 1 reconstructed examples without exposing the API key; result saved to `evaluation/results/day1-haiku.json`.
 - [x] Record model cost-control policy in `evidence/day-2/model-cost-control.md`.
+- [x] Add local `--estimate-only` and `--max-estimated-cost-usd` protections before paid Anthropic evaluation runs.
 - [ ] Verify repository-restricted, read-only GitHub access.
 - [ ] Share one anonymized Google Drive folder with the service account as Viewer.
 - [ ] Run the ten-case direct-prompt and Haiku comparisons.

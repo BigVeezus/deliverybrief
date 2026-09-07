@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from deliverybrief.demo_data import DEMO_PERIOD, demo_evidence
-from deliverybrief.evaluation import load_cases, run_evaluation
+from deliverybrief.evaluation import estimate_evaluation_cost, load_cases, run_evaluation
 from deliverybrief.generator import DemoReportGenerator
 from deliverybrief.models import ProjectConfig
 from deliverybrief.storage import RunStore
@@ -59,6 +59,16 @@ def test_evaluation_errors_count_against_pass_rate(tmp_path, monkeypatch) -> Non
     assert summary["passed_cases"] == 0
     assert summary["pass_rate"] == 0.0
     assert summary["results"][0]["status"] == "error"
+
+
+def test_cost_estimate_makes_no_model_call() -> None:
+    estimate = estimate_evaluation_cost(Path("evaluation/day1"), "primary")
+
+    assert estimate["model"] == "claude-haiku-4-5"
+    assert estimate["report_cases"] == 3
+    assert estimate["estimated_input_tokens"] > 0
+    assert estimate["max_output_tokens"] > 0
+    assert estimate["estimated_cost_upper_bound_usd"] > 0
 
 
 def test_workflow_records_generated_run(tmp_path) -> None:

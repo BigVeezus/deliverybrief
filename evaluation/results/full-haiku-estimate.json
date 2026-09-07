@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-09-07T19:38:09.761644+00:00",
+  "model_choice": "primary",
+  "model": "claude-haiku-4-5",
+  "dataset": "evaluation/cases",
+  "report_cases": 9,
+  "estimated_input_tokens": 11066,
+  "max_output_tokens": 54000,
+  "estimated_cost_upper_bound_usd": 0.281066,
+  "note": "This is a local conservative estimate. It makes no Anthropic API call and assumes each report uses the configured max output tokens."
+}

@@ -1,0 +1,80 @@
+{
+  "action_items": [
+    {
+      "due_date": "2026-09-08",
+      "evidence_ids": [
+        "GDOC-WEEKLY-0904-UPLOAD"
+      ],
+      "owner": "Client Product Lead",
+      "review_status": "confirmed",
+      "task": "Bulk upload validation continues."
+    },
+    {
+      "due_date": "2026-09-07",
+      "evidence_ids": [
+        "GDOC-WEEKLY-0904-RISK"
+      ],
+      "owner": "QA Lead",
+      "review_status": "confirmed",
+      "task": "The staging test dataset is still missing two invalid-row examples."
+    }
+  ],
+  "blockers": [
+    {
+      "evidence_ids": [
+        "GDOC-WEEKLY-0904-RISK"
+      ],
+      "text": "The staging test dataset is still missing two invalid-row examples."
+    }
+  ],
+  "client_label": "Client Northstar",
+  "completed": [
+    {
+      "evidence_ids": [
+        "GH-PR-142",
+        "GDOC-WEEKLY-0904-INVOICE"
+      ],
+      "text": "PR 142 Add invoice export filters: Merged on 2026-09-02."
+    }
+  ],
+  "decisions": [],
+  "executive_summary": "The Northstar Portal team completed 1 supported item(s). The evidence contains 1 item(s) in progress and 1 blocker or risk item(s).",
+  "executive_summary_evidence_ids": [
+    "GH-PR-142",
+    "GH-ISSUE-87",
+    "GDOC-WEEKLY-0904-INVOICE",
+    "GDOC-WEEKLY-0904-UPLOAD",
+    "GDOC-WEEKLY-0904-RISK"
+  ],
+  "in_progress": [
+    {
+      "evidence_ids": [
+        "GH-ISSUE-87",
+        "GDOC-WEEKLY-0904-UPLOAD"
+      ],
+      "text": "Issue 87 Bulk upload validation: Open."
+    }
+  ],
+  "next_priorities": [
+    {
+      "evidence_ids": [
+        "GDOC-WEEKLY-0904-UPLOAD"
+      ],
+      "text": "Bulk upload validation continues."
+    },
+    {
+      "evidence_ids": [
+        "GDOC-WEEKLY-0904-RISK"
+      ],
+      "text": "The staging test dataset is still missing two invalid-row examples."
+    }
+  ],
+  "period": {
+    "end": "2026-09-04",
+    "start": "2026-08-31"
+  },
+  "project_name": "Northstar Portal",
+  "source_limitations": [
+    "This result was generated from the bundled sample evidence, not live systems."
+  ]
+}

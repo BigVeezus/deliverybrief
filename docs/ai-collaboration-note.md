@@ -150,6 +150,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `evaluation/results/full-haiku.json`, `evidence/day-2/full-haiku-evaluation-summary.md`, `deliverybrief/generator.py`, `deliverybrief/evaluation.py`, and `deliverybrief/validator.py`.
 
+### 7 September 2026 Public app-run evidence
+
+**Tool and model.** Streamlit public app, deterministic demo generator, and Codex coding agent.
+
+**Delegated work.** I ran the public app in the browser, approved the generated sample report, and saved the exported files and screenshot. I asked the agent to organize the evidence.
+
+**Accepted.** The app-run artifacts were copied into `evidence/day-2/app-run/` and summarized as product-demo evidence.
+
+**Rejected or corrected.** I did not treat the sample app run as proof of real-world time savings. It is evidence that the deployed workflow can be opened, approved, and exported.
+
+**Verification.** The exported run summary shows `status: approved`, `evidence_count: 5`, `edits_made: true`, and no external sending. The screenshot shows the generated client-email preview with evidence IDs.
+
+**Decision I owned.** I chose to use this evidence for the Working System and Case Study while keeping the time-savings claim separate.
+
+**Artifact.** `evidence/day-2/app-run-summary.md` and files under `evidence/day-2/app-run/`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

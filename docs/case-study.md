@@ -74,7 +74,11 @@ The time-reduction result is not final yet because I still need an observed user
 
 ## User response
 
-The target manager will complete one unaided run. The observation will record hesitation, evidence checked, wording changed, approval decision, and requested changes. Only recorded feedback will be quoted.
+I completed a public Streamlit app run using the bundled sample evidence. The run generated a report, I reviewed and approved it, and the app exported a client email, action CSV, report JSON, and run summary. The run summary records `status: approved`, `evidence_count: 5`, `edits_made: true`, and `generator: deterministic-demo-v1`.
+
+The captured app-run artifacts are stored in `evidence/day-2/app-run/`. The screenshot shows the generated client-email preview with evidence IDs attached to the report bullets. This supports the Working System demo, but I do not treat it as proof of real-world time savings because it used sample evidence.
+
+The remaining user-response evidence needed is a short observed run or review from another target user, if time allows.
 
 ## Limits and next two weeks
 

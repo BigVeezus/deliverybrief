@@ -88,3 +88,9 @@ Three useful failures have already been recorded:
 The first evaluation covers one project shape and ten cases. Pattern-based privacy checks can produce false positives. A read-only integration reduces source risk but does not prove the client wording is correct. The manager remains the final approver.
 
 Remaining evidence needed before final PDF submission: direct-prompt baseline, target-user run/edit observations, live GitHub/Google credential check if used, final screenshots, and final document review.
+
+## App-run evidence
+
+The public Streamlit app was run with bundled sample evidence on 7 September 2026. The approved run produced four exports: client email, action CSV, report JSON, and run summary. The run summary recorded `status: approved`, `evidence_count: 5`, `edits_made: true`, `generator: deterministic-demo-v1`, and `latency_ms: 1`.
+
+This app-run evidence verifies the demo workflow and export controls. It is not counted as the measured time-reduction result because it used sample evidence rather than a live manager's weekly source material.

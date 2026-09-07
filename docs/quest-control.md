@@ -32,6 +32,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [ ] Run Sonnet only if Elvis explicitly approves the extra cost for a named comparison.
 - [x] Record at least three failures, fixes, and regression outcomes in the Evaluation Package and Case Study source docs.
 - [ ] Observe one unaided manager run and one follow-up feedback run.
+- [x] Capture one Elvis public Streamlit app run with approved exports in `evidence/day-2/app-run/`.
 - [ ] Replace remaining draft evidence-boundary sections after direct-prompt/user-run evidence is ready.
 - [ ] Add real screenshots and a before/after excerpt to the case study.
 - [ ] Review every sentence in Elvis's own words and rebuild the PDFs.

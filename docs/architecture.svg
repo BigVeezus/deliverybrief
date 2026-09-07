@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">DeliveryBrief architecture and data flow</title>
+  <desc id="desc">Read-only GitHub and Google Docs evidence flows through normalization, structured report generation, deterministic validation, human approval, and downloadable exports.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#275d7a"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Arial, sans-serif; fill: #182026; }
+      .subtitle { font: 16px Arial, sans-serif; fill: #4a5963; }
+      .box { fill: #ffffff; stroke: #275d7a; stroke-width: 2; rx: 12; }
+      .gate { fill: #eff5f8; stroke: #275d7a; stroke-width: 2; rx: 12; }
+      .label { font: 700 17px Arial, sans-serif; fill: #182026; text-anchor: middle; }
+      .small { font: 14px Arial, sans-serif; fill: #4a5963; text-anchor: middle; }
+      .arrow { stroke: #275d7a; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .note { font: 14px Arial, sans-serif; fill: #275d7a; }
+    </style>
+  </defs>
+  <rect width="1200" height="520" fill="#fbfcfd"/>
+  <text x="60" y="58" class="title">DeliveryBrief architecture</text>
+  <text x="60" y="88" class="subtitle">Evidence remains inspectable; deterministic gates supplement model output; external communication stays human-controlled.</text>
+
+  <rect x="60" y="145" width="170" height="88" class="box"/>
+  <text x="145" y="181" class="label">GitHub REST</text>
+  <text x="145" y="207" class="small">PRs, issues, commits</text>
+  <rect x="60" y="275" width="170" height="88" class="box"/>
+  <text x="145" y="311" class="label">Google Docs</text>
+  <text x="145" y="337" class="small">selected weekly notes</text>
+
+  <path d="M230 189 L300 240" class="arrow"/>
+  <path d="M230 319 L300 268" class="arrow"/>
+  <rect x="305" y="205" width="170" height="96" class="gate"/>
+  <text x="390" y="241" class="label">Normalize</text>
+  <text x="390" y="267" class="small">stable evidence IDs</text>
+
+  <path d="M475 253 L535 253" class="arrow"/>
+  <rect x="540" y="205" width="170" height="96" class="box"/>
+  <text x="625" y="241" class="label">Claude draft</text>
+  <text x="625" y="267" class="small">schema + citations</text>
+
+  <path d="M710 253 L770 253" class="arrow"/>
+  <rect x="775" y="185" width="185" height="136" class="gate"/>
+  <text x="868" y="221" class="label">Validate</text>
+  <text x="868" y="249" class="small">citations · dates</text>
+  <text x="868" y="273" class="small">conflicts · secrets · PII</text>
+  <text x="868" y="297" class="small">missing action fields</text>
+
+  <path d="M960 253 L1015 253" class="arrow"/>
+  <rect x="1020" y="205" width="130" height="96" class="box"/>
+  <text x="1085" y="241" class="label">Human</text>
+  <text x="1085" y="267" class="small">edit + approve</text>
+
+  <path d="M1085 301 L1085 382" class="arrow"/>
+  <rect x="920" y="390" width="230" height="76" class="gate"/>
+  <text x="1035" y="420" class="label">Download exports</text>
+  <text x="1035" y="446" class="small">email · CSV · JSON · run</text>
+
+  <text x="60" y="425" class="note">Source permissions: repository-restricted and read-only</text>
+  <text x="60" y="451" class="note">Approval blocks on unsupported citations, secrets, PII, and critical conflicts</text>
+  <text x="60" y="477" class="note">DeliveryBrief drafts files; it never sends external communication</text>
+</svg>

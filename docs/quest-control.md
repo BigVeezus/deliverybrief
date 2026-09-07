@@ -6,7 +6,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 
 | Portal slot | Prepared now | Still required before submission |
 |---|---|---|
-| Working System | Public repository, tested local demo, and deployed Streamlit URL: https://deliverybrief.streamlit.app/ | Make the Streamlit app public/no-login, re-test while logged out, and add the verified URL to the README |
+| Working System | Public repository, tested local demo, deployed Streamlit URL, and screenshot showing public sharing enabled: https://deliverybrief.streamlit.app/ | Re-test while logged out from a separate browser, incognito window, or phone |
 | Evaluation Package | Rendered PDF with method, cases, current engineering results, and evidence boundary | Add direct-prompt, Haiku, Sonnet, target-user timing, edit-rate, and failure-regression results |
 | Case Study | Rendered PDF with scope, title rationale, architecture, choices, and honest current limit | Add observed workflow, screenshots, measured before/after results, and recorded user reaction |
 | AI Collaboration Note | Rendered PDF covering planning, implementation, corrections, and verification | Append live-integration, field-test, hardening, document review, and video-review entries |
@@ -16,7 +16,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 
 - [x] Deadline confirmation requested; Erwin confirmed on 7 September 2026 that the Quest timer is active, but did not provide an exact timestamp deadline in the reply.
 - [x] Record the approximate Quest acceptance time: Monday, 7 September 2026 at 3:00 PM WAT.
-- [ ] Make the Streamlit app public/no-login and re-test https://deliverybrief.streamlit.app/ while logged out.
+- [ ] Re-test https://deliverybrief.streamlit.app/ while logged out from a separate browser, incognito window, or phone.
 - [ ] Complete one target-user interview using `docs/user-interview.md`.
 - [ ] Collect three anonymized weekly input/output examples with consent.
 - [ ] Measure the manual workflow for those three weeks.

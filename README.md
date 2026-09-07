@@ -2,7 +2,7 @@
 
 DeliveryBrief helps a project or delivery manager turn GitHub activity and project notes into a client email and an internal action list. Every factual item links back to evidence, and the manager must review the result before approval.
 
-[Source repository](https://github.com/BigVeezus/deliverybrief) · Live demo link will be added after Streamlit Community Cloud deployment.
+[Source repository](https://github.com/BigVeezus/deliverybrief) · [Live demo](https://deliverybrief.streamlit.app/)
 
 The name is deliberately plain. **Delivery** names the manager's responsibility. **Brief** describes the short output. I left AI out of the product name because the user needs a dependable weekly report, not another AI interface.
 

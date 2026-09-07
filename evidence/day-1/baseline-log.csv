@@ -1,4 +1,4 @@
 week_label,source_material,time_minutes,steps_count,biggest_delay,common_error,notes
-Week A,,,,"","",""
-Week B,,,,"","",""
-Week C,,,,"","",""
+Week B,"GitHub PRs plus developer notes",55,,"Reading PRs with missing descriptions and unclear ownership","Risk from old queued jobs may be missed","Payment retry/idempotency case"
+Week C,"Two repositories plus developer notes",75,,"Reconstructing cross-repository timeline from merge dates","Coordination issue can be misread as only a coding issue","Mobile/backend contract case"
+Week D,"GitHub PRs plus one Slack/developer note",40,,"Finding revert reason that exists outside the PR description","Revert reason and contractor access blocker may be missed","Reporting pipeline migration case"

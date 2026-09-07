@@ -70,6 +70,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** `evidence/day-1/interview-notes-elvis-proxy.md`.
 
+### 7 September 2026 Weekly example cleanup
+
+**Tool and model.** Codex coding agent.
+
+**Delegated work.** I supplied three public-safe weekly examples covering payment retry risk, cross-repository contract coordination, and reporting-pipeline migration/revert context. I asked the agent whether they were sufficient and how to use them.
+
+**Accepted.** The examples were recorded as anonymized reconstructed weeks, with manual time estimates of 55 minutes, 75 minutes, and 40 minutes. The shared pattern is that Git history alone does not explain the real delivery state.
+
+**Rejected or corrected.** I did not claim the examples are public PRs or exact production records. They are documented as reconstructed examples from real operating patterns.
+
+**Verification.** I reviewed that each example includes what happened, PR information, developer notes, MD-facing summary, action items, blockers, manual time estimate, and private information removed.
+
+**Decision I owned.** I chose to use reconstructed examples because public PRs were not available and private project material should not be exposed in a public Quest submission.
+
+**Artifact.** `evidence/day-1/weekly-examples-index.md` and `evidence/day-1/baseline-log.csv`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.

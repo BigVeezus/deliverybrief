@@ -19,8 +19,8 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [x] Re-test https://deliverybrief.streamlit.app/ while logged out from a phone; screenshot saved in `evidence/day-1/screenshots/mobile-public-url.png`.
 - [x] Record Elvis-provided target-user perspective in `evidence/day-1/interview-notes-elvis-proxy.md`.
 - [ ] Complete one external target-user interview using `docs/user-interview.md` if time allows.
-- [ ] Collect three anonymized weekly input/output examples with consent.
-- [ ] Measure the manual workflow for those three weeks.
+- [x] Collect three anonymized reconstructed weekly examples in `evidence/day-1/weekly-examples-index.md`.
+- [x] Record manual time estimates for the three examples in `evidence/day-1/baseline-log.csv`.
 - [ ] Run one small Anthropic API request and retain the timestamp result without exposing the key.
 - [ ] Verify repository-restricted, read-only GitHub access.
 - [ ] Share one anonymized Google Drive folder with the service account as Viewer.

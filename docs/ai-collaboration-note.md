@@ -38,7 +38,22 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Artifact.** Repository implementation and `docs/evidence-needed.md`.
 
+### 7 September 2026 Deployment and Day 1 evidence planning
+
+**Tool and model.** Codex coding agent.
+
+**Delegated work.** I asked the agent to verify the deployed Streamlit URL and break the Day 1 evidence work into practical next steps.
+
+**Accepted.** The app URL is recorded as `https://deliverybrief.streamlit.app/`. The Quest acceptance time is recorded as Monday, 7 September 2026 at 3:00 PM WAT. Erwin's reply confirmed that the timer is active.
+
+**Rejected or corrected.** The deployed URL was not treated as final because a logged-out check redirected to Streamlit sign-in. I need to make the app public before submitting it as the Working System link.
+
+**Verification.** The deployed URL was checked without an existing logged-in browser session and returned a sign-in redirect instead of the public application.
+
+**Decision I owned.** I will collect real Day 1 evidence manually and only include user feedback, timing numbers, and examples that I can explain and defend.
+
+**Artifact.** `docs/quest-control.md`.
+
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.
-

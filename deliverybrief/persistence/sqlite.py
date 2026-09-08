@@ -155,6 +155,13 @@ class SQLiteRunRepository:
                 ),
             )
 
+    def update_record(self, run_id: str, record: RunRecord) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                "UPDATE runs SET status = ?, record_json = ? WHERE run_id = ? AND session_id = ?",
+                (record.status.value, record.model_dump_json(), run_id, self.session_id),
+            )
+
     def audit(self, run_id: str, event: str, detail: str) -> None:
         with self.connect() as connection:
             connection.execute(

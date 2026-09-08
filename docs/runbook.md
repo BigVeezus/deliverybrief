@@ -41,7 +41,7 @@ Project notes can be native Google Docs, `.txt`, `.md`, `.csv`, or `.docx` files
 7. Correct wording without removing required evidence IDs.
 8. Resolve blocking findings. Acknowledge remaining warnings only after review.
 9. Approve the report.
-10. Download the email, action CSV, JSON report, and run summary.
+10. Download the email, client PDF/DOCX, action CSV, JSON report, run summary, and workflow trace.
 
 ## Status meanings
 
@@ -74,7 +74,20 @@ Read each finding and its evidence IDs. Remove sensitive data, correct the sourc
 
 ## Logs and records
 
-Local runs are stored in the configured SQLite file. Each record contains the model, latency, token use, findings, edits, and approval status. Hosted demo storage is temporary; download the run summary when evidence is needed.
+Local runs are stored in the configured SQLite file. Each record contains the model, latency, token use, findings, edits, approval status, and workflow trace. Hosted demo storage is temporary; download the run summary and workflow trace when evidence is needed.
+
+## Tool selection and trace
+
+Open the “Tool selector” panel before generation when debugging configuration. It shows which sources and generators are selected or skipped:
+
+- demo mode selects bundled sample evidence and the deterministic generator;
+- live mode selects GitHub only when `GITHUB_TOKEN` and `GITHUB_REPOSITORY` exist;
+- live mode selects Drive notes only when the service-account JSON and folder ID exist;
+- upload and pasted notes appear only when the operator provides them;
+- Claude is selected only in live mode with an Anthropic key and a positive budget;
+- exports are selected only after the stored approved snapshot matches the current report and evidence.
+
+Open the “Workflow trace” panel after generation or approval. It records step name, tool, status, reason, counts, attempts, latency, and redacted errors. Trace data is for monitoring and handoff; it intentionally stores counts and fingerprints instead of raw private source bodies.
 
 ## Secret rotation
 
@@ -114,8 +127,8 @@ Set an explicit positive `DELIVERYBRIEF_BUDGET_USD` for live generation. No budg
 
 For an alternate model, configure its exact identifier in `ANTHROPIC_PRICED_MODEL` and explicit `ANTHROPIC_MODEL_INPUT_PER_MTOK` and `ANTHROPIC_MODEL_OUTPUT_PER_MTOK` rates after checking provider pricing. Unknown or invalid rates block requests. Historical Haiku pricing assumptions remain configuration-dependent estimates. These application controls do not cap unrelated provider-account spending.
 
-Run records contain version fingerprints, attempts, usage, validation and approval information. SQLite `audit_events` records generation failures by error type without raw provider content. Public app logs are temporary. Rotate a leaked key in its provider console, replace the configured secret, and restart the private live instance.
+Run records contain version fingerprints, attempts, usage, validation, approval information, and workflow traces. SQLite `audit_events` records generation failures by error type without raw provider content. Public app logs are temporary. Rotate a leaked key in its provider console, replace the configured secret, and restart the private live instance.
 
 ## Verification and handoff
 
-Run `python scripts/live_smoke.py --max-cost-usd 0.08` only in a private environment with credentials configured. It writes raw details to ignored `tmp/live-smoke/` and a redacted summary to `evidence/live-smoke/`. Then run `pytest --junitxml=output/reliability-tests.xml`, `python scripts/summarize_reliability.py`, Ruff, mypy, and the secret scanner. Review `docs/user-observation-session.md` with a consenting participant before claiming measured time savings.
+Run `deliverybrief-live-smoke --estimate-only --max-cost-usd 0.08` or `python scripts/live_smoke.py --estimate-only --max-cost-usd 0.08` first to check source access and cost without constructing the Anthropic generator. Run the full smoke only in a private environment with credentials configured. It writes raw details to ignored `tmp/live-smoke/` and a redacted summary to `evidence/live-smoke/`. Then run `pytest --junitxml=output/reliability-tests.xml`, `python scripts/summarize_reliability.py`, Ruff, mypy, and the secret scanner. Review `docs/user-observation-session.md` with a consenting participant before claiming measured time savings.

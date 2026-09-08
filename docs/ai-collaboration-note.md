@@ -235,7 +235,7 @@ Tool and model: Codex coding agent, local live-smoke harness, GitHub API, Google
 
 Delegated: build a repeatable private smoke test that uses configured credentials, calls GitHub, reads the shared Drive folder, calls Claude only after a budget check, approves through the same approval service, exports from the approved snapshot, and writes only a redacted public summary.
 
-Accepted in the implementation: one live run collected 26 GitHub records and one Drive text note for 7-8 September 2026, called Haiku once under a `$0.08` cap, returned valid structured JSON, produced warnings rather than blocks, approved the reviewed snapshot, and generated six exports.
+Accepted in the implementation: one live run collected 26 GitHub records and one Drive text note for 7-8 September 2026, called Haiku once under a `$0.08` cap, returned valid structured JSON, produced warnings rather than blocks, approved the reviewed snapshot, and generated six exports at the time of the run.
 
 Corrected through inspection and tests: the first Google attempt found that my uploaded note was a `.txt` file, not a native Google Doc. I changed the Drive adapter to support native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes. The first export attempt also failed because the harness tried to export with evidence that did not match the stored approval snapshot; I changed it to export from stored evidence, which is the correct safety behavior.
 
@@ -244,3 +244,19 @@ Verification: focused integration tests cover text and DOCX extraction. The priv
 My decision: I will describe this as a private live-source smoke, not a full adoption study. It proves that the configured live path can collect sources, call Claude under a cap, validate, approve, and export without exposing private source text in the repository.
 
 Artifacts: `scripts/live_smoke.py`, `deliverybrief/integrations/google_docs.py`, `tests/test_integrations.py`, and `evidence/live-smoke/live-smoke-summary.md`.
+
+### 8 September 2026 Tool selector and workflow trace upgrade
+
+Tool and model: Codex coding agent in this task; no Anthropic API requests.
+
+Delegated: add a lightweight orchestration layer that shows tool selection, skipped tools, trace steps, attempts, latency, redacted errors, approval/export state, and a CLI smoke-test entrypoint.
+
+Accepted in the implementation: I kept orchestration explicit in Python. The app now has a `ToolSelector` service, `ToolSelection` and `WorkflowTraceStep` models, trace helpers, SQLite persistence for traces, a Streamlit trace panel, a workflow-trace JSON export, and `deliverybrief-live-smoke` as a console entrypoint.
+
+Rejected or corrected: I did not add LangGraph, CrewAI, n8n, or another orchestration framework this late because that would add integration risk without improving the reviewer’s ability to inspect this five-day workflow. I also corrected the trace redactor so private GitHub/Drive/Docs URLs do not appear in trace output.
+
+Verification: 97 pytest tests passed, including new tests for demo/live tool selection, missing-budget behavior, Drive and user-supplied source labels, generation/validation/approval/export traces, edit-after-approval invalidation, trace redaction, safe script import, and the estimate-only live-smoke path. Ruff and strict mypy passed after the change.
+
+My decision: I will explain this as workflow orchestration implemented directly in Python: tool selection, state, retries, validation, approval gates, trace logging, and reproducible exports. I will not pretend that using a framework name is the same thing as building a reliable workflow.
+
+Artifacts: `deliverybrief/services/tool_selector.py`, `deliverybrief/services/tracing.py`, `tests/test_tool_selector_trace.py`, `deliverybrief/ui/app.py`, `deliverybrief/exporting/service.py`, and `scripts/live_smoke.py`.

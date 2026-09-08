@@ -10,6 +10,8 @@ class ReportGenerationError(RuntimeError):
 
 
 class ReportGenerator(Protocol):
+    kind: str
+
     def generate(
         self,
         project: ProjectConfig,

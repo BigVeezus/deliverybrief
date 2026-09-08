@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+TraceStatus = Literal["selected", "skipped", "started", "success", "failed", "blocked"]
+
 
 class SourceType(StrEnum):
     GITHUB = "github"
@@ -25,6 +27,29 @@ class ApprovalStatus(StrEnum):
     REVIEW_REQUIRED = "review_required"
     BLOCKED = "blocked"
     APPROVED = "approved"
+
+
+class ToolSelection(BaseModel):
+    tool_name: str
+    category: str
+    selected: bool
+    reason: str
+    missing_config: list[str] = Field(default_factory=list)
+
+
+class WorkflowTraceStep(BaseModel):
+    step_name: str
+    tool_name: str
+    status: TraceStatus
+    reason: str
+    started_at: datetime
+    ended_at: datetime | None = None
+    latency_ms: int | None = None
+    attempts: int = 1
+    input_count: int | None = None
+    output_count: int | None = None
+    error: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class ReportingPeriod(BaseModel):
@@ -132,6 +157,7 @@ class RunRecord(BaseModel):
     attempts: int = 1
     warning_acknowledgements: list[str] = Field(default_factory=list)
     client_reviewed: bool = False
+    trace: list[WorkflowTraceStep] = Field(default_factory=list)
 
 
 class EvaluationResult(BaseModel):

@@ -7,7 +7,7 @@ This note explains where to change the system after the maintainability refactor
 ```text
 app.py
   deliverybrief/ui/                 Streamlit screens and session state
-  deliverybrief/services/           Workflow orchestration
+  deliverybrief/services/           Workflow orchestration, tool selection, trace helpers
   deliverybrief/generation/         Claude adapter, demo adapter, prompt/schema, cost estimate
   deliverybrief/intake.py           Evidence validation, normalization, fingerprints
   deliverybrief/validator.py        Deterministic report checks
@@ -29,6 +29,8 @@ the implementation lives in named packages.
 - Change source validation, upload limits, duplicate handling, or evidence fingerprints in
   `deliverybrief/intake.py`.
 - Change blocking/warning rules in `deliverybrief/validator.py`.
+- Change tool-selection rules in `deliverybrief/services/tool_selector.py`.
+- Change trace step shape or redaction in `deliverybrief/services/tracing.py`.
 - Change approval, warning acknowledgement, conflict resolution, or edit invalidation in
   `deliverybrief/approval/service.py`.
 - Change SQLite tables or migrations in `deliverybrief/persistence/sqlite.py`.
@@ -41,3 +43,7 @@ the implementation lives in named packages.
 Run `pytest`, Ruff, mypy, and the secret scanner after changing shared workflow behavior.
 The `tests/test_project_structure.py` checks that the named layers exist and that command-line
 scripts do not run work at import time.
+
+The workflow trace is intentionally lightweight. It is not a replacement for production
+observability, but it shows the operational path for this Quest: source selection, generation,
+validation, approval, export, status, attempts, output counts, latency, and redacted errors.

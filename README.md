@@ -23,7 +23,7 @@ Demo mode requires no private credentials. It uses labeled sample evidence and a
 3. Generate a draft.
 4. Review citations and warnings.
 5. Edit and approve the report.
-6. Download the client PDF, Word document, email, internal action CSV, JSON, and run summary.
+6. Download the client PDF, Word document, email, internal action CSV, JSON, run summary, and workflow trace.
 
 The application never sends email or changes GitHub or Google Drive.
 
@@ -40,10 +40,12 @@ Google Drive/Docs --/                                      -> Human review
 
 The live adapters are read-only. Claude receives normalized evidence with stable IDs and returns a structured report. Deterministic checks then verify that cited IDs exist, dates are plausible, action fields are complete, and client text does not contain common secret or personal-data patterns.
 
+I kept orchestration explicit in Python instead of adding a workflow framework this late. The app still shows the important AI OS behavior: it selects available tools, records why each tool ran or skipped, tracks attempts and latency, stores validation and approval gates, and exports a redacted workflow trace for review.
+
 The code is split into named runtime layers:
 
 - `deliverybrief/ui/` contains the Streamlit screens.
-- `deliverybrief/services/` coordinates the report run.
+- `deliverybrief/services/` coordinates the report run, tool selection, and workflow trace.
 - `deliverybrief/generation/` contains the Claude adapter, demo adapter, prompt/schema, and cost estimate.
 - `deliverybrief/approval/` owns approval, warning acknowledgement, conflict resolution, and edit invalidation.
 - `deliverybrief/persistence/` owns SQLite storage and migrations.
@@ -77,9 +79,9 @@ pytest --junitxml=output/reliability-tests.xml
 python scripts/summarize_reliability.py
 ```
 
-The expanded catalog contains 48 named workflow cases (36 development and 12 reserved), plus boundary, integration, structure, and Streamlit tests. The current local suite has 87 passing tests, and executed results are in `evaluation/results/reliability-v2.json`. These tests measure workflow behavior: intake, validation, approval, exports, privacy patterns, and failure handling. Earlier files preserve a 1/9 direct-prompt result and 9/9 structured-workflow result under different proxy scorers; those pass rates are historical learning evidence, not a controlled factual-quality comparison. Evaluation v2 separates citation validity from human-reviewed factual grounding, expected-fact coverage, and action accuracy.
+The expanded catalog contains 48 named workflow cases (36 development and 12 reserved), plus boundary, integration, structure, trace, CLI, and Streamlit tests. The current local suite has 97 passing tests, and executed results are in `evaluation/results/reliability-v2.json`. These tests measure workflow behavior: intake, validation, approval, exports, privacy patterns, cost-control paths, tool selection, trace redaction, and failure handling. Earlier files preserve a 1/9 direct-prompt result and 9/9 structured-workflow result under different proxy scorers; those pass rates are historical learning evidence, not a controlled factual-quality comparison. Evaluation v2 separates citation validity from human-reviewed factual grounding, expected-fact coverage, and action accuracy.
 
-The private live smoke test collected 26 GitHub records and one Google Drive note, called Claude Haiku once under a `$0.08` cap, approved the validated report, and produced six export files. The public summary is in `evidence/live-smoke/live-smoke-summary.md`; raw source text remains ignored under `tmp/live-smoke/`.
+The private live smoke test collected 26 GitHub records and one Google Drive note, called Claude Haiku once under a `$0.08` cap, approved the validated report, and produced six export files at the time of the run. Current approved runs also export `Workflow trace.json`. The public summary is in `evidence/live-smoke/live-smoke-summary.md`; raw source text remains ignored under `tmp/live-smoke/`.
 
 ## Important limits
 
@@ -110,5 +112,7 @@ The private live smoke test collected 26 GitHub records and one Google Drive not
 Choose among five free examples, paste developer notes, or upload up to 2 MB and 200 evidence records. Uploads are clearly labeled user supplied. Client PDF and Word exports exclude internal actions and source URLs. Approval is enforced against stored evidence and report versions; edits require reapproval.
 
 Live generation additionally requires `DELIVERYBRIEF_BUDGET_USD`. The budget ledger reserves conservative request costs before each attempt. Unknown pricing fails closed. It does not control spending by other applications. Hosted local files can disappear on redeployment; keep the public demo free and use durable storage before a sustained paid pilot.
+
+The “Tool selector” and “Workflow trace” panels are for handoff and debugging. They show selected/skipped sources, generation mode, approval/export availability, step status, output counts, latency, and redacted errors without storing raw note bodies or credentials.
 
 See [Reliability changes and failures](docs/reliability-upgrade.md) and [User timing session](docs/user-observation-session.md).

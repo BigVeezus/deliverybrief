@@ -17,6 +17,8 @@ from deliverybrief.integrations.github import GitHubEvidenceClient
 from deliverybrief.integrations.google_docs import GoogleDocsEvidenceClient
 from deliverybrief.models import ApprovalStatus, EvidenceItem, FindingSeverity, ReportingPeriod
 from deliverybrief.privacy import redact
+from deliverybrief.services.tool_selector import ToolSelectorInput, select_tools
+from deliverybrief.services.tracing import fail_step, finish_step, start_step
 from deliverybrief.storage import RunStore
 from deliverybrief.workflow import generate_and_record
 
@@ -42,6 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--private-output", type=Path, default=PRIVATE_DIR / "raw-live-smoke.json")
     parser.add_argument("--public-summary", type=Path, default=PUBLIC_DIR / "live-smoke-summary.md")
     parser.add_argument("--export-existing-run-id")
+    parser.add_argument("--estimate-only", action="store_true")
     return parser.parse_args()
 
 
@@ -65,30 +68,86 @@ def selected_budget(args: argparse.Namespace) -> float | None:
 
 
 def collect_live(settings: Settings, period: ReportingPeriod, limit_docs: int) -> dict[str, Any]:
-    with GitHubEvidenceClient(
-        settings.github_token or "",
-        settings.project.github_repository,
-        timezone=settings.project.timezone,
-    ) as github:
-        github_evidence = github.collect(period)
+    trace = []
+    github_step = start_step(
+        "collect_github",
+        "github_rest_api",
+        "Collect pull requests, issues, and commits from the configured repository.",
+    )
+    try:
+        with GitHubEvidenceClient(
+            settings.github_token or "",
+            settings.project.github_repository,
+            timezone=settings.project.timezone,
+        ) as github:
+            github_evidence = github.collect(period)
+        trace.append(finish_step(github_step, output_count=len(github_evidence)))
+    except Exception as error:
+        trace.append(fail_step(github_step, error))
+        raise
 
     google = GoogleDocsEvidenceClient(
         settings.google_service_account_json or "",
         settings.project.google_drive_folder_id or "",
     )
-    documents = google.list_documents()
-    selected = documents[:limit_docs]
-    if not selected:
-        raise RuntimeError(
-            "Google folder contains no supported note files. Add a Google Doc, .txt, .md, "
-            ".csv, or .docx file and share the folder with the service account as Viewer."
-        )
-    google_evidence = google.collect([item["id"] for item in selected])
+    list_step = start_step(
+        "list_drive_notes",
+        "google_drive_notes",
+        "List supported project-note files from the configured Drive folder.",
+    )
+    try:
+        documents = google.list_documents()
+        trace.append(finish_step(list_step, output_count=len(documents)))
+        selected = documents[:limit_docs]
+        if not selected:
+            raise RuntimeError(
+                "Google folder contains no supported note files. Add a Google Doc, .txt, .md, "
+                ".csv, or .docx file and share the folder with the service account as Viewer."
+            )
+    except Exception as error:
+        trace.append(fail_step(list_step, error))
+        raise
+
+    collect_step = start_step(
+        "collect_drive_notes",
+        "google_drive_notes",
+        "Collect selected Drive project notes.",
+        input_count=len(selected),
+    )
+    try:
+        google_evidence = google.collect([item["id"] for item in selected])
+        trace.append(finish_step(collect_step, output_count=len(google_evidence)))
+    except Exception as error:
+        trace.append(fail_step(collect_step, error))
+        raise
     return {
         "documents": documents,
         "selected_documents": selected,
         "evidence": [*github_evidence, *google_evidence],
+        "trace": trace,
     }
+
+
+def live_tool_selections(
+    settings: Settings,
+    budget: float | None,
+    approved: bool = False,
+) -> list[dict[str, Any]]:
+    return [
+        selection.model_dump(mode="json")
+        for selection in select_tools(
+            ToolSelectorInput(
+                mode=settings.mode,
+                github_repository=settings.project.github_repository,
+                github_token=settings.github_token,
+                google_service_account_json=settings.google_service_account_json,
+                google_drive_folder_id=settings.project.google_drive_folder_id,
+                anthropic_api_key=settings.anthropic_api_key,
+                budget_usd=budget,
+                approved_snapshot_valid=approved,
+            )
+        )
+    ]
 
 
 def safe_titles(items: list[EvidenceItem], limit: int = 10) -> list[dict[str, str]]:
@@ -141,12 +200,22 @@ def write_public_summary(path: Path, summary: dict[str, Any]) -> None:
         f"- Validation findings: {', '.join(summary.get('finding_codes', [])) or 'none'}",
         f"- Approval status: {summary.get('approval_status')}",
         f"- Exported files: {', '.join(summary.get('exports', [])) or 'none'}",
+        f"- Workflow trace steps: {summary.get('trace_steps', 0)}",
         "",
         "## Redacted evidence titles",
         "",
     ]
     for item in summary.get("sample_titles", []):
         lines.append(f"- {item['label']} ({item['ingestion']}): {item['title']}")
+    lines.extend(["", "## Tool selections", ""])
+    for item in summary.get("selected_tools", []):
+        missing = ", ".join(item.get("missing_config", []))
+        selected = "selected" if item.get("selected") else "skipped"
+        suffix = f" Missing: {missing}." if missing else ""
+        lines.append(
+            f"- {item['tool_name']} ({item['category']}): "
+            f"{selected}. {item['reason']}{suffix}"
+        )
     lines.extend(
         [
             "",
@@ -207,6 +276,7 @@ def main() -> None:
         EXPORT_DIR.mkdir(parents=True, exist_ok=True)
         for filename, data in stored_exports.items():
             (EXPORT_DIR / filename.replace(" ", "-")).write_bytes(data)
+        refreshed = store.get(record.run_id)
         public_summary = {
             "generated_at": datetime.now(UTC).isoformat(),
             "status": "passed",
@@ -229,6 +299,8 @@ def main() -> None:
             "finding_codes": sorted({finding.code for finding in record.findings}),
             "approval_status": record.status.value,
             "exports": sorted(stored_exports),
+            "selected_tools": live_tool_selections(settings, budget_cap, approved=True),
+            "trace_steps": len(refreshed[0].trace) if refreshed else 0,
             "sample_titles": safe_titles(stored_evidence),
             "approval_error": None,
         }
@@ -243,13 +315,48 @@ def main() -> None:
             f"Estimated request cost ${estimate.estimated_cost_usd:.6f} exceeds cap "
             f"${budget_cap:.6f}. No Anthropic request was sent."
         )
+    if args.estimate_only:
+        public_summary = {
+            "generated_at": datetime.now(UTC).isoformat(),
+            "status": "estimated",
+            "repository": settings.project.github_repository,
+            "google_folder_id": settings.project.google_drive_folder_id,
+            "period": f"{period.start} to {period.end}",
+            "model": settings.primary_model,
+            "run_id": "not run",
+            "budget_cap_usd": budget_cap,
+            "github_records": sum(item.source.value == "github" for item in evidence),
+            "google_docs_listed": len(collection["documents"]),
+            "google_docs_collected": len(collection["selected_documents"]),
+            "evidence_records": len(evidence),
+            "estimated_request_cost_usd": estimate.estimated_cost_usd,
+            "actual_estimated_cost_usd": None,
+            "latency_ms": None,
+            "attempts": 0,
+            "finding_codes": [],
+            "approval_status": "not run",
+            "exports": [],
+            "selected_tools": live_tool_selections(settings, budget_cap),
+            "trace_steps": len(collection["trace"]),
+            "sample_titles": safe_titles(evidence),
+            "approval_error": None,
+        }
+        print(json.dumps(public_summary, indent=2, default=str))
+        return
 
     generator = AnthropicReportGenerator(
         settings.anthropic_api_key or "",
         settings.primary_model,
         BudgetLedger(args.budget_db, budget_cap),
     )
-    result, record = generate_and_record(generator, store, settings.project, period, evidence)
+    result, record = generate_and_record(
+        generator,
+        store,
+        settings.project,
+        period,
+        evidence,
+        trace=collection["trace"],
+    )
     finding_codes = [finding.code for finding in record.findings]
     blocked = any(finding.severity == FindingSeverity.BLOCK for finding in record.findings)
     exports: dict[str, bytes] = {}
@@ -283,6 +390,7 @@ def main() -> None:
     by_source = {source.value: 0 for source in {item.source for item in evidence}}
     for item in evidence:
         by_source[item.source.value] = by_source.get(item.source.value, 0) + 1
+    refreshed = store.get(record.run_id)
     public_summary = {
         "generated_at": datetime.now(UTC).isoformat(),
         "status": "passed" if exports else "blocked" if blocked else "failed",
@@ -303,9 +411,12 @@ def main() -> None:
         "finding_codes": sorted(set(finding_codes)),
         "approval_status": record.status.value,
         "exports": sorted(exports),
+        "selected_tools": live_tool_selections(settings, budget_cap, approved=bool(exports)),
+        "trace_steps": len(refreshed[0].trace) if refreshed else 0,
         "sample_titles": safe_titles(evidence),
         "approval_error": approval_error,
     }
+    persisted_trace = refreshed[0].trace if refreshed else record.trace
     private_payload = {
         **public_summary,
         "documents": [
@@ -318,6 +429,7 @@ def main() -> None:
         ],
         "run_record": record.model_dump(mode="json"),
         "report": result.report.model_dump(mode="json"),
+        "trace": [step.model_dump(mode="json") for step in persisted_trace],
         "evidence": [item.model_dump(mode="json") for item in evidence],
     }
     write_private(args.private_output, private_payload)

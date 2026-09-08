@@ -26,6 +26,7 @@ DUE_RE = re.compile(r"(?:Due|by)\s+(20\d{2}-\d{2}-\d{2})", re.IGNORECASE)
 class DemoReportGenerator:
     """Deterministic sample generator used only when the app is explicitly in demo mode."""
 
+    kind = "demo"
     model = "deterministic-demo-v1"
 
     def generate(

@@ -1,6 +1,6 @@
 # DeliveryBrief — five-minute Loom walkthrough
 
-Rehearsal script for the current app, before the proposed refactor. Timings include clicks. Use your own voice and rehearse once.
+Rehearsal script for the current app after the maintainability and trace upgrade. Timings include clicks. Use your own voice and rehearse once.
 
 ## Before recording
 
@@ -18,9 +18,11 @@ Show the application title.
 
 ## 0:40–1:35 — Show evidence and drafting
 
-Click Load evidence, open Inspect evidence and context, show a GitHub-labeled record and a developer note, then Generate weekly brief.
+Click Load evidence, open Tool selector, open Inspect evidence and context, show a GitHub-labeled record and a developer note, then Generate weekly brief.
 
 “This public walkthrough uses labeled samples and a free, rule-based simulation. It isn't calling Claude. I also ran the private live path with GitHub, a Drive note, Google Docs access, and Claude Haiku under a budget cap.
+
+“This panel is the tool selector. In demo mode it selects sample evidence and the deterministic generator. In live mode it selects GitHub, Drive notes, uploads, pasted notes, or Claude only when the required configuration exists.
 
 “Each record keeps its source, timestamp, and evidence ID. The draft refers back to those records so a manager can investigate a statement.
 
@@ -28,13 +30,17 @@ Click Load evidence, open Inspect evidence and context, show a GitHub-labeled re
 
 ## 1:35–2:35 — Review, approve, and export
 
-Compare a report item with its evidence. Review internal actions, tick the review checkbox, acknowledge any warnings, and approve. Download/open the client PDF. Return and edit the summary to an evidence-supported alternative; move focus out of the field.
+Compare a report item with its evidence. Review internal actions, tick the review checkbox, acknowledge any warnings, and approve. Download/open the client PDF and workflow trace JSON. Return and edit the summary to an evidence-supported alternative; move focus out of the field.
 
 “I check the wording before approval. The internal action list is separate from the client PDF and Word document.
 
 “All downloads use the stored approved version. Now I'll edit it. The downloads disappear until I review and approve again.
 
 “That check runs below the interface too. Calling the export function directly doesn't bypass approval.”
+
+Open the Workflow trace expander.
+
+“The trace is how I make the workflow inspectable. It records collection, generation, validation, approval, and export steps with counts, timing, attempts, and redacted errors. It stores facts about the run, not raw private note text or credentials.”
 
 ## 2:35–3:35 — Show messy input and judgment
 
@@ -54,7 +60,7 @@ Do not invent a confirmation to get an approved result. Showing the blocked stat
 
 Show the saved reliability result and case breakdown.
 
-“The suite passes automated tests covering 48 named scenarios, messy inputs, API failures, privacy, approval, exports, and Drive note formats. These are software tests, not 48 live Claude evaluations.
+“The suite passes 97 automated tests covering 48 named scenarios, messy inputs, API failures, privacy, approval, exports, Drive note formats, tool selection, traces, and the live-smoke estimate path. These are software tests, not 48 live Claude evaluations.
 
 “One important correction was in my evaluator: a valid citation doesn't prove the sentence is true. I separated citation validity from factual grounding, which now requires claim-by-claim review.
 
@@ -66,7 +72,7 @@ Return to the free-simulation label.
 
 “Public examples make no paid requests. Live generation requires a budget, reserves an estimated maximum before each attempt, and limits retries. It controls this workflow, not other spending on the Anthropic account.
 
-“The private live smoke collected 26 GitHub records and one Drive note, called Claude once, approved the validated report, and exported six files. I still have not measured the 60 percent time-saving target with another user.
+“The private live smoke collected 26 GitHub records and one Drive note, called Claude once, approved the validated report, and exported the approved files. New approved runs also export a workflow trace. I still have not measured the 60 percent time-saving target with another user.
 
 “The next improvement comes from a manager using it, recording corrections, and turning failures into regression tests.”
 

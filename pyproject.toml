@@ -31,9 +31,10 @@ dev = [
 
 [project.scripts]
 deliverybrief-evaluate = "deliverybrief.evaluation:main"
+deliverybrief-live-smoke = "scripts.live_smoke:main"
 
 [tool.setuptools.packages.find]
-include = ["deliverybrief*"]
+include = ["deliverybrief*", "scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

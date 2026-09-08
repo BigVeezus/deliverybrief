@@ -263,3 +263,26 @@ breakage during a deadline-bound Quest.
 
 **Revisit when.** The project becomes a longer-lived product and all downstream users can migrate
 to the newer package imports.
+
+## 16 Explicit Python orchestration instead of a late workflow framework
+
+**Context and evidence.** The job description values workflows with tool use, state, retrieval,
+approval, retries, fallbacks, observability, and evaluation. Late in the Quest, adding a framework
+would increase integration risk and reduce my ability to explain every line.
+
+**Alternatives considered.** Add LangGraph, CrewAI, n8n, or another orchestration layer before
+submission.
+
+**Decision.** I kept orchestration explicit in Python and added a tool selector plus workflow trace
+models.
+
+**Reason.** The important signal is the workflow behavior: selecting tools, showing skipped tools,
+tracking step status, preserving state, enforcing approval, recording retries and latency, and
+exporting a redacted trace. This demonstrates the execution layer without making the app harder to
+maintain.
+
+**Trade-off.** The project does not show hands-on use of a named orchestration framework. It shows
+the underlying pattern directly.
+
+**Revisit when.** A second workflow or scheduled multi-step automation needs graph branching,
+parallel tool calls, durable workers, or human-in-the-loop queues beyond Streamlit and SQLite.

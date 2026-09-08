@@ -31,6 +31,8 @@ from .schema import (
 
 
 class AnthropicReportGenerator:
+    kind = "anthropic"
+
     def __init__(self, api_key: str, model: str, budget: BudgetLedger | None = None) -> None:
         self.client = Anthropic(api_key=api_key, max_retries=0, timeout=30.0)
         self.model = model

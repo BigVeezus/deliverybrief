@@ -20,6 +20,8 @@ from deliverybrief.integrations.google_docs import GoogleDocsEvidenceClient
 from deliverybrief.models import ApprovalStatus, EvidenceItem, FindingSeverity, ReportingPeriod
 from deliverybrief.privacy import redact, safe_evidence
 from deliverybrief.scenarios import SCENARIOS, scenario_evidence
+from deliverybrief.services.tool_selector import ToolSelectorInput, select_tools
+from deliverybrief.services.tracing import fail_step, finish_step, instant_step, start_step
 from deliverybrief.storage import RunStore
 from deliverybrief.workflow import generate_and_record
 
@@ -37,6 +39,7 @@ session_defaults: dict[str, Any] = {
     "documents": [],
     "busy": False,
     "collection_errors": {},
+    "trace": [],
 }
 for name, default in session_defaults.items():
     if name not in st.session_state:
@@ -54,6 +57,53 @@ def put_source(name: str, items: list[EvidenceItem]) -> None:
     reset_draft()
     st.session_state.sources[name] = safe_evidence(items)
     st.session_state.collection_errors.pop(name, None)
+
+
+def add_trace(step: Any) -> None:
+    st.session_state.trace.append(step)
+
+
+def budget_value() -> float | None:
+    value = os.getenv("DELIVERYBRIEF_BUDGET_USD")
+    try:
+        return float(value) if value else None
+    except ValueError:
+        return None
+
+
+def tool_selector_input(
+    *,
+    has_upload: bool = False,
+    has_pasted_note: bool = False,
+    approved_snapshot_valid: bool = False,
+) -> ToolSelectorInput:
+    return ToolSelectorInput(
+        mode=settings.mode,
+        github_repository=settings.project.github_repository,
+        github_token=settings.github_token,
+        google_service_account_json=settings.google_service_account_json,
+        google_drive_folder_id=settings.project.google_drive_folder_id,
+        anthropic_api_key=settings.anthropic_api_key,
+        budget_usd=budget_value(),
+        has_upload=has_upload,
+        has_pasted_note=has_pasted_note,
+        approved_snapshot_valid=approved_snapshot_valid,
+    )
+
+
+def trace_rows(steps: list[Any]) -> list[dict[str, object]]:
+    return [
+        {
+            "Step": step.step_name,
+            "Tool": step.tool_name,
+            "Status": step.status,
+            "Reason": step.reason,
+            "Outputs": step.output_count,
+            "Time ms": step.latency_ms,
+            "Error": step.error,
+        }
+        for step in steps
+    ]
 
 
 st.title("DeliveryBrief")
@@ -80,6 +130,7 @@ else:
         reset_draft()
         st.session_state.sources = {}
         st.session_state.collection_errors = {}
+        st.session_state.trace = []
         st.session_state.collection_period = str(period)
 st.header("1 Collect evidence")
 if settings.is_demo:
@@ -90,10 +141,22 @@ if settings.is_demo:
         format_func=lambda key: SCENARIOS[str(key)],
     )
     if st.button("Load evidence", type="primary"):
+        step = start_step(
+            "collect_sample_evidence",
+            "sample_evidence",
+            "Demo mode uses bundled public-safe evidence.",
+        )
         st.session_state.sources = {}
-        put_source("sample", scenario_evidence(selected))
+        items = scenario_evidence(selected)
+        put_source("sample", items)
+        add_trace(finish_step(step, output_count=len(items)))
 else:
     if st.button("Collect GitHub / retry GitHub"):
+        step = start_step(
+            "collect_github",
+            "github_rest_api",
+            "GitHub token and repository are configured.",
+        )
         try:
             if not settings.github_token:
                 raise ValueError("Configure GITHUB_TOKEN for read-only access.")
@@ -102,18 +165,30 @@ else:
                 settings.project.github_repository,
                 timezone=settings.project.timezone,
             ) as client:
-                put_source("github", client.collect(period))
+                items = client.collect(period)
+                put_source("github", items)
+                add_trace(finish_step(step, output_count=len(items)))
         except Exception as error:
             st.session_state.collection_errors["github"] = redact(str(error))
+            add_trace(fail_step(step, error))
     if st.button("List Drive notes"):
+        step = start_step(
+            "list_drive_notes",
+            "google_drive_notes",
+            "Google Drive service account and folder are configured.",
+        )
         try:
             google = GoogleDocsEvidenceClient(
                 settings.google_service_account_json or "",
                 settings.project.google_drive_folder_id or "",
             )
             st.session_state.documents = google.list_documents()
+            add_trace(finish_step(step, output_count=len(st.session_state.documents)))
         except Exception:
             st.error("Cannot list notes. Check the folder and service-account access.")
+            add_trace(
+                fail_step(step, "Cannot list notes. Check folder and service-account access.")
+            )
     docs = st.session_state.documents
     selected_ids = st.multiselect(
         "Select notes",
@@ -121,20 +196,31 @@ else:
         format_func=lambda key: next(d["name"] for d in docs if d["id"] == key),
     )
     if st.button("Collect selected notes / retry notes", disabled=not selected_ids):
+        step = start_step(
+            "collect_drive_notes",
+            "google_drive_notes",
+            "Read selected project-note files from the configured Drive folder.",
+            input_count=len(selected_ids),
+        )
         try:
             google = GoogleDocsEvidenceClient(
                 settings.google_service_account_json or "",
                 settings.project.google_drive_folder_id or "",
             )
+            collected = 0
             for doc_id in selected_ids:
                 try:
-                    put_source(f"google-{doc_id}", google.collect([doc_id]))
+                    items = google.collect([doc_id])
+                    put_source(f"google-{doc_id}", items)
+                    collected += len(items)
                 except Exception:
                     st.session_state.collection_errors[f"google-{doc_id}"] = (
                         "Cannot read note. Check access and retry."
                     )
+            add_trace(finish_step(step, output_count=collected))
         except Exception:
             st.error("Cannot connect to Google. Check credentials and folder configuration.")
+            add_trace(fail_step(step, "Cannot connect to Google. Check credentials and folder."))
 with st.expander("Use your own anonymized evidence"):
     st.caption("Uploads and pasted notes are labeled user supplied, not fetched evidence.")
     st.download_button(
@@ -145,26 +231,73 @@ with st.expander("Use your own anonymized evidence"):
     )
     upload = st.file_uploader("Evidence JSON — maximum 2 MB and 200 records", type=["json"])
     if st.button("Load uploaded evidence", disabled=upload is None):
+        step = start_step(
+            "load_uploaded_json",
+            "evidence_json_upload",
+            "Validate and normalize uploaded evidence records.",
+            input_count=1,
+        )
         try:
             assert upload is not None
-            put_source("upload", parse_upload(upload.getvalue()))
+            items = parse_upload(upload.getvalue())
+            put_source("upload", items)
+            add_trace(finish_step(step, output_count=len(items)))
         except ValueError as error:
             st.error(str(error))
+            add_trace(fail_step(step, error))
     notes = st.text_area("Paste developer notes")
     if st.button("Add developer note", disabled=not notes.strip()):
+        step = start_step(
+            "load_pasted_note",
+            "pasted_developer_note",
+            "Convert pasted developer notes into a user-supplied evidence item.",
+            input_count=1,
+        )
         try:
-            put_source(
-                "pasted",
-                [
-                    pasted_note(
-                        notes,
-                        settings.project,
-                        datetime.combine(period.end, datetime.min.time(), tzinfo=UTC),
-                    )
-                ],
-            )
+            items = [
+                pasted_note(
+                    notes,
+                    settings.project,
+                    datetime.combine(period.end, datetime.min.time(), tzinfo=UTC),
+                )
+            ]
+            put_source("pasted", items)
+            add_trace(finish_step(step, output_count=len(items)))
         except ValueError as error:
             st.error(str(error))
+            add_trace(fail_step(step, error))
+
+with st.expander("Tool selector", expanded=False):
+    selections = select_tools(
+        tool_selector_input(
+            has_upload=upload is not None,
+            has_pasted_note=bool(notes.strip()),
+            approved_snapshot_valid=False,
+        )
+    )
+    st.table(
+        [
+            {
+                "Tool": item.tool_name,
+                "Category": item.category,
+                "Selected": item.selected,
+                "Reason": item.reason,
+                "Missing": ", ".join(item.missing_config),
+            }
+            for item in selections
+        ]
+    )
+    if not st.session_state.trace:
+        add_trace(
+            instant_step(
+                "select_tools",
+                "tool_selector",
+                "success",
+                "Tool availability was evaluated from mode, credentials, and provided inputs.",
+                input_count=len(selections),
+                output_count=sum(1 for item in selections if item.selected),
+            )
+        )
 for source, message in st.session_state.collection_errors.items():
     st.warning(f"{source}: {message}. Successfully collected evidence is preserved.")
 try:
@@ -216,10 +349,16 @@ if st.button("Generate weekly brief", disabled=not ack_partial or st.session_sta
             )
             with st.spinner("Preparing draft and checking evidence"):
                 result, record = generate_and_record(
-                    generator, store, settings.project, period, evidence
+                    generator,
+                    store,
+                    settings.project,
+                    period,
+                    evidence,
+                    trace=st.session_state.trace,
                 )
             st.session_state.cache[key] = result, record
         st.session_state.result, st.session_state.record = result, record
+        st.session_state.trace = list(record.trace)
     except Exception as error:
         st.error(redact(str(error)))
     finally:
@@ -322,4 +461,14 @@ with st.expander("Run summary for reviewers"):
     st.caption(
         "Simulation is not a model evaluation. Hosted logs are temporary, "
         "not a production audit archive."
+    )
+with st.expander("Workflow trace"):
+    current = store.get(record.run_id)
+    steps = current[0].trace if current else st.session_state.trace
+    st.table(trace_rows(steps))
+    st.download_button(
+        "Workflow trace JSON",
+        json.dumps([step.model_dump(mode="json") for step in steps], indent=2, default=str),
+        "Workflow-trace.json",
+        mime="application/json",
     )

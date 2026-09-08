@@ -48,4 +48,12 @@ The reserved cases are not an independently authored benchmark. Their first exec
 
 Secrets and personal data matching supported patterns are masked before model submission and checked again in outputs. This cannot detect every sensitive fact or adversarial instruction. Human client-suitability review remains mandatory. Hosted SQLite files and budget reservations may be lost on redeployment; persistent storage is required before production use.
 
-The private live smoke used one Haiku request under a `$0.08` cap. It collected 26 GitHub records and one Drive note, produced an approved report, and exported six files. Model-quality review, observed time savings, and a consenting user's adoption session remain separate verification tasks.
+The private live smoke used one Haiku request under a `$0.08` cap. It collected 26 GitHub records and one Drive note, produced an approved report, and exported six files at the time of the run. The later trace upgrade adds a seventh approved export, `Workflow trace.json`, and tests that the estimate-only smoke path does not construct the Anthropic generator. Model-quality review, observed time savings, and a consenting user's adoption session remain separate verification tasks.
+
+## Tool selection and trace upgrade
+
+I added tool selection and workflow tracing after reviewing the role requirements again. Demo mode now selects sample evidence and the deterministic generator. Live mode selects GitHub, Drive notes, uploads, pasted notes, Claude, and exports only when the required configuration or approved snapshot exists. Missing configuration is shown as a reason, not hidden as a failed run.
+
+Each traced step stores the step name, selected tool, status, reason, timestamps, latency, attempts, input/output counts, redacted error, and small metadata. The trace is saved with the run record and included in both the run summary and a separate workflow-trace JSON export. It redacts API keys, tokens, emails, private GitHub/Drive/Docs URLs, Google key material, and raw source bodies.
+
+I deliberately did not add LangGraph, CrewAI, or n8n this late. DeliveryBrief now demonstrates the core workflow concepts directly in Python: tool selection, state, retries, validation, approval gates, trace logging, and reproducible exports.

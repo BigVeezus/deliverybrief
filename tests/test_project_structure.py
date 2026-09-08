@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.util
 from pathlib import Path
 
 
@@ -36,10 +37,14 @@ def test_legacy_imports_still_resolve() -> None:
 
 
 def test_scripts_are_import_safe() -> None:
-    for module in (
-        "scripts.apply_quality_reviews",
-        "scripts.build_sample_documents",
-        "scripts.build_submission_documents",
-        "scripts.summarize_reliability",
+    for path in (
+        Path("scripts/apply_quality_reviews.py"),
+        Path("scripts/build_sample_documents.py"),
+        Path("scripts/build_submission_documents.py"),
+        Path("scripts/summarize_reliability.py"),
     ):
-        importlib.import_module(module)
+        spec = importlib.util.spec_from_file_location(path.stem, path)
+        assert spec is not None
+        assert spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)

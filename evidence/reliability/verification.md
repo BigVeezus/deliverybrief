@@ -10,6 +10,7 @@ Implementation commit: `eec5fe0`.
 - Client PDF and DOCX: generated from the same sample report; rendered and visually inspected.
 - Submission PDFs: evaluation 3 pages, case study 4 pages, AI collaboration 5 pages; all final pages inspected. Each file is under 1 MB. They remain drafts for Elvis's personal review.
 - New Anthropic requests during this upgrade: zero.
+- GitHub CI verification job passed for the implementation commit on Linux. Public Streamlit showed the revised free workflow without requiring sign-in, and loading the normal sample produced five evidence records. Public screenshot: `evidence/reliability/public-updated.png`.
 
 ## Remaining release evidence
 

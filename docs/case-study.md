@@ -38,6 +38,8 @@ GitHub and Google Docs adapters convert source records into a shared `EvidenceIt
 
 The Streamlit interface exposes the evidence before generation. After generation, the manager can inspect citations and edit each section. Blocking findings disable approval. Warnings require acknowledgement. Approved reports can be downloaded as an email, CSV, JSON file, and run summary.
 
+After the reliability work, I refactored the code into named runtime layers: Streamlit UI, workflow service, generation adapters, approval rules, SQLite persistence, and export serializers. I kept compatibility wrappers for the older module names so the deadline work stayed stable while the structure became easier to inspect and extend.
+
 ## Why I made these choices
 
 I used Python and Streamlit because the five-day constraint favored a small, testable application over a custom frontend. I used my funded Anthropic account rather than adding a new billing dependency. Haiku remains the provisional low-cost candidate; the earlier proxy evaluation does not establish a semantic quality advantage. Sonnet remains a possible benchmark, but I stopped further Sonnet runs after deciding to cap spend.
@@ -90,6 +92,8 @@ The first version does not establish reliability across organizations. The next 
 
 The revision adds 48 named workflow cases, approval checks below the interface, evidence snapshots, session isolation, bounded retries, conservative budget reservations, and PDF/Word exports. Actual automated results are in `evaluation/results/reliability-v2.json`. Model factual quality remains pending a claim-by-claim review.
 
-Tests caught a phone detector that damaged ISO timestamps and a demo matcher that interpreted “No completed work” as completed work. Both now have regression coverage. The new evaluator deliberately leaves semantic scores pending rather than converting valid citations into claims of factual accuracy. The detailed failure log is in `docs/reliability-upgrade.md`.
+Tests caught a phone detector that damaged ISO timestamps and a demo matcher that interpreted “No completed work” as completed work. Both now have regression coverage. The new evaluator deliberately leaves semantic scores pending rather than converting valid citations into claims of factual accuracy. A final structure test also checks that the refactored package boundaries exist and that helper scripts are import-safe. The detailed failure log is in `docs/reliability-upgrade.md`.
 
 Client updates are the selected primary output. The MD-reporting perspective remains useful problem context, but a real external participant has not yet validated this narrower client workflow. The observed user session and the 60 percent time-saving target remain pending.
+
+The final refactored `main` branch passed GitHub Actions in run `34189560471`. No new paid Anthropic calls were made during the reliability or maintainability revision.

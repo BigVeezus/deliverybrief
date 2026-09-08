@@ -2,9 +2,9 @@
 
 ## What this evaluation establishes
 
-DeliveryBrief has an expanded set of 48 named workflow cases, plus regression and interface tests. The current software suite passes 82 automated tests. The 48 named cases pass as 36 development cases and 12 reserved cases. These are free software contract tests, including mocked APIs and deterministic output. They are not a live Anthropic quality benchmark or evidence of user adoption.
+DeliveryBrief has an expanded set of 48 named workflow cases, plus regression, interface, and structure tests. The current software suite passes 85 automated tests locally and in GitHub Actions. The 48 named cases pass as 36 development cases and 12 reserved cases. These are free software contract tests, including mocked APIs and deterministic output. They are not a live Anthropic quality benchmark or evidence of user adoption.
 
-The executed results are in `evaluation/results/reliability-v2.json`. The complete test output is reproducible with `pytest --junitxml=output/reliability-tests.xml` followed by `python scripts/summarize_reliability.py`.
+The executed results are in `evaluation/results/reliability-v2.json`. The complete test output is reproducible with `pytest --junitxml=output/reliability-tests.xml` followed by `python scripts/summarize_reliability.py`. The refactored `main` branch passed CI in run `34189560471` after a Linux import-path issue in the structure test was corrected.
 
 ## Baselines and provenance
 
@@ -57,7 +57,7 @@ Earlier Anthropic schema rejection and the missing cross-repository/action findi
 
 ## Costs and remaining evidence
 
-No new paid Anthropic calls were made for this revision. Public scenarios are free simulations. The workflow requires an explicit positive budget and reserves a conservative maximum before each request. Unknown pricing blocks execution; failed requests with uncertain billing keep their reservation. The maximum is three attempts and hidden SDK retries are disabled.
+No new paid Anthropic calls were made for this reliability and maintainability revision. Public scenarios are free simulations. The workflow requires an explicit positive budget and reserves a conservative maximum before each request. Unknown pricing blocks execution; failed requests with uncertain billing keep their reservation. The maximum is three attempts and hidden SDK retries are disabled.
 
 Application reservations do not cap unrelated account spending. Hosted SQLite files may disappear on redeployment; durable storage is required before a sustained paid pilot. Estimates are not provider billing guarantees.
 

@@ -219,10 +219,12 @@ behavior in the test runner, so the root `app.py` now imports or reloads the UI 
 Several scripts were changed so importing them does not accidentally execute work.
 
 Verification: the refactor added structure tests and kept the full automated suite passing locally.
-Ruff and mypy were run after the move.
+Ruff, mypy, pytest, and the secret scanner were run after the move. After push, GitHub Actions
+exposed a Linux import-path issue in the new structure test. I corrected the test to import helper
+scripts by file path and the final CI run `34189560471` passed.
 
-Elvis's decisions: keep this refactor on a review branch until he checks it, because the public demo
-should not change without review during the Quest deadline.
+Elvis's decisions: review the refactor before merging, then keep the public demo on the verified
+`main` branch once local checks and GitHub Actions passed.
 
 Artifacts: `docs/developer-architecture.md`, `tests/test_project_structure.py`, and the refactored
 package folders.

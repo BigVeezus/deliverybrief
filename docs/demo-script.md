@@ -22,7 +22,7 @@ Click Load evidence, open Tool selector, open Inspect evidence and context, show
 
 “This public walkthrough uses labeled samples and a free, rule-based simulation. It isn't calling Claude. I also ran the private live path with GitHub, a Drive note, Google Docs access, and Claude Haiku under a budget cap.
 
-“This panel is the tool selector. In demo mode it selects sample evidence and the deterministic generator. In live mode it selects GitHub, Drive notes, uploads, pasted notes, or Claude only when the required configuration exists.
+“This panel is the tool selector. In demo mode it selects sample evidence and the deterministic generator. In live mode it selects GitHub, Drive notes, pasted notes, or Claude only when the required configuration exists.
 
 “Each record keeps its source, timestamp, and evidence ID. The draft refers back to those records so a manager can investigate a statement.
 

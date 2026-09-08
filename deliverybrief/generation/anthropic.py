@@ -16,7 +16,7 @@ from deliverybrief.models import (
     UsageRecord,
     WeeklyReport,
 )
-from deliverybrief.privacy import safe_evidence
+from deliverybrief.privacy import redact, safe_evidence
 
 from .base import ReportGenerationError
 from .costs import estimate_cost, estimate_generation_cost
@@ -56,9 +56,9 @@ class AnthropicReportGenerator:
             )
         prompt = report_prompt(project, period, evidence)
         started = time.perf_counter()
+        response = None
+        attempts = 0
         try:
-            response = None
-            attempts = 0
             for attempt in range(3):
                 self.budget.reserve(estimate.estimated_cost_usd)
                 attempts += 1
@@ -112,10 +112,16 @@ class AnthropicReportGenerator:
                     text_blocks.append(str(cast(Any, block).text))
             text = "".join(text_blocks)
             report = WeeklyReport.model_validate_json(text)
+        except ReportGenerationError as error:
+            detail = safe_detail(str(error))
+            raise ReportGenerationError(f"{detail} No demo fallback was used.") from error
         except Exception as error:
+            detail = " ".join(str(error).split())
+            detail = safe_detail(detail)
             raise ReportGenerationError(
-                "Claude could not complete a valid report. Check budget, access, or input size. "
-                f"Failure type: {type(error).__name__}. No demo fallback was used."
+                "Claude returned output that did not match the required report structure. "
+                f"Failure type: {type(error).__name__}. Detail: {detail}. "
+                "No demo fallback was used."
             ) from error
         latency_ms = round((time.perf_counter() - started) * 1000)
         input_tokens = int(getattr(response.usage, "input_tokens", 0))
@@ -132,3 +138,8 @@ class AnthropicReportGenerator:
             generator="anthropic",
             attempts=attempts,
         )
+
+
+def safe_detail(text: str, limit: int = 500) -> str:
+    cleaned = redact(text)
+    return cleaned[:limit] + ("..." if len(cleaned) > limit else "")

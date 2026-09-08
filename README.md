@@ -109,7 +109,7 @@ The private live smoke test collected 26 GitHub records and one Google Drive not
 
 ## Reliability revision
 
-Choose among five free examples, paste developer notes, or upload up to 2 MB and 200 evidence records. Uploads are clearly labeled user supplied. Client PDF and Word exports exclude internal actions and source URLs. Approval is enforced against stored evidence and report versions; edits require reapproval.
+Choose among five free examples, fetch GitHub work, select one or more Drive notes, or paste an extra developer note. The manager-facing app hides raw JSON evidence because that is an engineering/debug format, not a normal PM task. The backend still keeps a tested JSON intake path for automated evaluation and reproducible fixtures. Client PDF and Word exports exclude internal actions and source URLs. Approval is enforced against stored evidence and report versions; edits require reapproval.
 
 Live generation additionally requires `DELIVERYBRIEF_BUDGET_USD`. The budget ledger reserves conservative request costs before each attempt. Unknown pricing fails closed. It does not control spending by other applications. Hosted local files can disappear on redeployment; keep the public demo free and use durable storage before a sustained paid pilot.
 

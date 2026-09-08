@@ -83,7 +83,7 @@ Open the “Tool selector” panel before generation when debugging configuratio
 - demo mode selects bundled sample evidence and the deterministic generator;
 - live mode selects GitHub only when `GITHUB_TOKEN` and `GITHUB_REPOSITORY` exist;
 - live mode selects Drive notes only when the service-account JSON and folder ID exist;
-- upload and pasted notes appear only when the operator provides them;
+- pasted notes appear only when the operator provides them;
 - Claude is selected only in live mode with an Anthropic key and a positive budget;
 - exports are selected only after the stored approved snapshot matches the current report and evidence.
 
@@ -111,7 +111,7 @@ boundaries and the tests that prove those boundaries still exist.
 
 ## Reliability revision operation
 
-Use “Load evidence” to choose a free scenario. The payment, mobile, and migration weeks are reconstructed examples; the unsafe week is synthetic. “Use your own anonymized evidence” provides pasted notes and JSON upload. Maximum upload size is 2 MB with 200 records. Invalid IDs, duplicate-ID conflicts, and timezone-free timestamps require correction before generation.
+Use “Load evidence” to choose a free scenario. The payment, mobile, and migration weeks are reconstructed examples; the unsafe week is synthetic. “Paste an extra developer note” lets a manager add a note from chat, Slack, or email without handling raw JSON. The backend still has a tested JSON intake path for automated fixtures and evaluation, capped at 2 MB and 200 records. Invalid IDs, duplicate-ID conflicts, and timezone-free timestamps require correction before generation.
 
 In live mode, collect GitHub and selected Google notes separately. A failed note leaves other sources intact. Retry the failed source button. Changing the reporting period clears stale selections. Single-source continuation requires acknowledgement.
 

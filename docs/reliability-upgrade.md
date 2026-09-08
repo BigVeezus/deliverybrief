@@ -8,7 +8,7 @@ The previous score called citation existence “grounding.” That allowed a sta
 
 Approval previously depended on interface checks. The shared store now requires a stored evidence snapshot, current validation, warning acknowledgements, and explicit factual/client review. Exports compare both the report and evidence fingerprints. An edit or source change removes approval.
 
-The public app provides five free simulations and accepts pasted notes or JSON. Every uploaded record is labeled as user supplied. IDs are namespaced for live repositories and documents. Conflicting duplicate IDs stop intake. Records explicitly assigned to other projects are excluded; ambiguous dependencies remain visible for review.
+The public app provides five free simulations, live GitHub/Drive collection when configured, and pasted developer notes. I removed raw JSON upload from the manager-facing UI because it is not how a non-technical PM thinks about weekly updates. The backend still keeps a tested JSON intake path for fixtures, automated evaluation, and reproducible edge cases. User-supplied records are labeled as user supplied. IDs are namespaced for live repositories and documents. Conflicting duplicate IDs stop intake. Records explicitly assigned to other projects are excluded; ambiguous dependencies remain visible for review.
 
 Source collection is separate for GitHub and each selected note. A failed note can be retried without losing a successful GitHub collection. Both connectors paginate; Google Docs tabs, Drive text notes, Markdown, CSV, and DOCX text/table content are supported. Reporting-week GitHub boundaries use the configured timezone. Google modification dates carry a warning because they are not event dates.
 
@@ -52,7 +52,7 @@ The private live smoke used one Haiku request under a `$0.08` cap. It collected 
 
 ## Tool selection and trace upgrade
 
-I added tool selection and workflow tracing after reviewing the role requirements again. Demo mode now selects sample evidence and the deterministic generator. Live mode selects GitHub, Drive notes, uploads, pasted notes, Claude, and exports only when the required configuration or approved snapshot exists. Missing configuration is shown as a reason, not hidden as a failed run.
+I added tool selection and workflow tracing after reviewing the role requirements again. Demo mode now selects sample evidence and the deterministic generator. Live mode selects GitHub, Drive notes, pasted notes, Claude, and exports only when the required configuration or approved snapshot exists. Missing configuration is shown as a reason, not hidden as a failed run.
 
 Each traced step stores the step name, selected tool, status, reason, timestamps, latency, attempts, input/output counts, redacted error, and small metadata. The trace is saved with the run record and included in both the run summary and a separate workflow-trace JSON export. It redacts API keys, tokens, emails, private GitHub/Drive/Docs URLs, Google key material, and raw source bodies.
 

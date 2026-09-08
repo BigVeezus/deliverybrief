@@ -14,7 +14,7 @@ from deliverybrief.config import load_settings
 from deliverybrief.demo_data import DEMO_PERIOD
 from deliverybrief.exports import approved_exports
 from deliverybrief.generator import AnthropicReportGenerator, DemoReportGenerator
-from deliverybrief.intake import evidence_fingerprint, parse_upload, pasted_note, scoped_evidence
+from deliverybrief.intake import evidence_fingerprint, pasted_note, scoped_evidence
 from deliverybrief.integrations.github import GitHubEvidenceClient
 from deliverybrief.integrations.google_docs import GoogleDocsEvidenceClient
 from deliverybrief.models import ApprovalStatus, EvidenceItem, FindingSeverity, ReportingPeriod
@@ -151,7 +151,8 @@ if settings.is_demo:
         put_source("sample", items)
         add_trace(finish_step(step, output_count=len(items)))
 else:
-    if st.button("Collect GitHub / retry GitHub"):
+    st.caption(f"Configured repository: {settings.project.github_repository}")
+    if st.button("Fetch work from GitHub / retry"):
         step = start_step(
             "collect_github",
             "github_rest_api",
@@ -171,7 +172,7 @@ else:
         except Exception as error:
             st.session_state.collection_errors["github"] = redact(str(error))
             add_trace(fail_step(step, error))
-    if st.button("List Drive notes"):
+    if st.button("Find developer notes in Drive"):
         step = start_step(
             "list_drive_notes",
             "google_drive_notes",
@@ -191,11 +192,12 @@ else:
             )
     docs = st.session_state.documents
     selected_ids = st.multiselect(
-        "Select notes",
+        "Select one or more developer notes",
         [d["id"] for d in docs],
         format_func=lambda key: next(d["name"] for d in docs if d["id"] == key),
     )
-    if st.button("Collect selected notes / retry notes", disabled=not selected_ids):
+    st.caption("Choose every note that belongs to this weekly update.")
+    if st.button("Add selected notes to this update / retry", disabled=not selected_ids):
         step = start_step(
             "collect_drive_notes",
             "google_drive_notes",
@@ -221,30 +223,8 @@ else:
         except Exception:
             st.error("Cannot connect to Google. Check credentials and folder configuration.")
             add_trace(fail_step(step, "Cannot connect to Google. Check credentials and folder."))
-with st.expander("Use your own anonymized evidence"):
-    st.caption("Uploads and pasted notes are labeled user supplied, not fetched evidence.")
-    st.download_button(
-        "Download JSON example",
-        json.dumps([i.model_dump(mode="json") for i in scenario_evidence("normal")], indent=2),
-        "evidence-example.json",
-        mime="application/json",
-    )
-    upload = st.file_uploader("Evidence JSON — maximum 2 MB and 200 records", type=["json"])
-    if st.button("Load uploaded evidence", disabled=upload is None):
-        step = start_step(
-            "load_uploaded_json",
-            "evidence_json_upload",
-            "Validate and normalize uploaded evidence records.",
-            input_count=1,
-        )
-        try:
-            assert upload is not None
-            items = parse_upload(upload.getvalue())
-            put_source("upload", items)
-            add_trace(finish_step(step, output_count=len(items)))
-        except ValueError as error:
-            st.error(str(error))
-            add_trace(fail_step(step, error))
+with st.expander("Paste an extra developer note"):
+    st.caption("Use this when an update came through chat or a quick message instead of Drive.")
     notes = st.text_area("Paste developer notes")
     if st.button("Add developer note", disabled=not notes.strip()):
         step = start_step(
@@ -270,11 +250,14 @@ with st.expander("Use your own anonymized evidence"):
 with st.expander("Tool selector", expanded=False):
     selections = select_tools(
         tool_selector_input(
-            has_upload=upload is not None,
+            has_upload=False,
             has_pasted_note=bool(notes.strip()),
             approved_snapshot_valid=False,
         )
     )
+    visible_selections = [
+        item for item in selections if item.tool_name != "evidence_json_upload"
+    ]
     st.table(
         [
             {
@@ -284,7 +267,7 @@ with st.expander("Tool selector", expanded=False):
                 "Reason": item.reason,
                 "Missing": ", ".join(item.missing_config),
             }
-            for item in selections
+            for item in visible_selections
         ]
     )
     if not st.session_state.trace:
@@ -294,8 +277,8 @@ with st.expander("Tool selector", expanded=False):
                 "tool_selector",
                 "success",
                 "Tool availability was evaluated from mode, credentials, and provided inputs.",
-                input_count=len(selections),
-                output_count=sum(1 for item in selections if item.selected),
+                input_count=len(visible_selections),
+                output_count=sum(1 for item in visible_selections if item.selected),
             )
         )
 for source, message in st.session_state.collection_errors.items():
@@ -310,7 +293,7 @@ except ValueError as error:
 if excluded:
     st.warning(f"Excluded {len(excluded)} records explicitly assigned to another project.")
 if not evidence:
-    st.caption("Load a sample, collect sources, or upload evidence to begin.")
+    st.caption("Load a sample, fetch GitHub work, add Drive notes, or paste a note to begin.")
     st.stop()
 st.header("2 Check sources")
 st.caption(f"{len(evidence)} records · {period.start} to {period.end}")

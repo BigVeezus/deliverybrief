@@ -42,7 +42,7 @@ Use this as the single checklist for the active Quest. Evidence links and result
 
 ## 8 September reliability checkpoint
 
-- Implemented version-bound approval, source snapshots, scoped sessions, conservative budget reservations, upload/paste intake, five free examples, and client PDF/DOCX exports.
+- Implemented version-bound approval, source snapshots, scoped sessions, conservative budget reservations, pasted-note intake, five free examples, and client PDF/DOCX exports.
 - Free verification: automated tests pass locally, including 48 named scenarios. The split is 36 development / 12 initially held-out cases; these are software checks, not a timed user study.
 - Rebuilt submission documents for my final review. Earlier "grounding" scores are legacy citation proxies, not verified factual accuracy. See `docs/evaluation-package.md` for the corrected metric definitions.
 - Live source smoke passed privately with GitHub, a Drive text note, Google Docs API access, and Claude Haiku under a `$0.08` cap.

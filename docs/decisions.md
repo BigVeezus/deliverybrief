@@ -243,3 +243,23 @@ This record explains the choices I made while defining and building DeliveryBrie
 **Trade-off.** The initial ten-case sample is too small for a broad reliability claim.
 
 **Revisit when.** Real-user results show that these thresholds do not predict acceptable reports.
+
+## 15 Maintainability refactor with compatibility wrappers
+
+**Context and evidence.** After the reliability upgrade, `app.py`, `generator.py`, and `storage.py`
+were doing too many jobs at once. That made the project harder to explain as a maintainable
+workflow system even though the tests were passing.
+
+**Alternatives considered.** Leave the prototype structure unchanged, or perform a full rename of
+every public module and test import.
+
+**Decision.** I separated UI, workflow orchestration, generation, approval, persistence, and export
+code into named packages while keeping compatibility wrappers for the older imports.
+
+**Reason.** The new layout is easier to inspect and extend, and the wrappers reduce accidental
+breakage during a deadline-bound Quest.
+
+**Trade-off.** Some wrapper modules remain, so the codebase has a small amount of indirection.
+
+**Revisit when.** The project becomes a longer-lived product and all downstream users can migrate
+to the newer package imports.

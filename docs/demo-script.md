@@ -1,33 +1,77 @@
-# DeliveryBrief five minute demo
+# DeliveryBrief — five-minute Loom walkthrough
+
+Rehearsal script for the current app, before the proposed refactor. Timings include clicks. Use your own voice and rehearse once.
 
 ## Before recording
 
-Open the app, the latest client PDF, and the reliability results. Use only anonymized sources. Say “simulation” when using the free examples. Show a live GitHub/Google/Anthropic flow only after the private credentials and spending are authorized and verified. Do not read this script word for word.
+Open the public app on Normal delivery week, the latest client PDF, and evaluation/results/reliability-v2.json in separate tabs. Use free simulation; no paid model request is needed. Close private tabs and credential pages. Refresh the results section only after additional checks have actually happened.
 
-## 0 minutes to 40 seconds
+## 0:00–0:40 — Explain the problem
 
-Explain the problem: a manager reconstructs weekly delivery from vague PRs and developer notes. Explain why client updates are the chosen output. Describe Weeks B/C/D as reconstructed examples and the 55-minute median as an estimate, not measured savings.
+Show the application title.
 
-## 40 seconds to 2 minutes
+“Hi, I'm Elvis. I built DeliveryBrief for a project manager who turns GitHub activity and developer notes into a weekly client update.
 
-Load the normal example, inspect two pieces of evidence, generate the draft, and explain that a merged PR does not prove deployment. Point out stable citations. Explain that the public simulation costs nothing and live Anthropic generation is a separate mode.
+“The difficult part isn't typing. It's figuring out what actually happened when PR descriptions are vague and important context lives elsewhere.
 
-## 2 minutes to 3 minutes
+“I kept the first version to one configured project, with human approval before download. DeliveryBrief names the outcome: a brief about project delivery.”
 
-Inspect the client wording, acknowledge review, approve, and download the PDF or Word file. Show that internal actions are a separate export. Edit the approved summary and point out that downloads disappear until reapproval.
+## 0:40–1:35 — Show evidence and drafting
 
-## 3 minutes to 4 minutes
+Click Load evidence, open Inspect evidence and context, show a GitHub-labeled record and a developer note, then Generate weekly brief.
 
-Load the mobile/backend mismatch. Show both sources and the blocked state. Explain that the manager must confirm the situation, correct the draft, and record supporting evidence and a reason. Alternatively show the unsafe note and its blocked client wording. Do not pretend a checkbox proves semantic truth.
+“This public walkthrough uses labeled samples and a free, rule-based simulation. It isn't calling Claude. The separate live mode connects to GitHub, Google Docs, and Anthropic.
 
-## 4 minutes to 4 minutes 35 seconds
+“Each record keeps its source, timestamp, and evidence ID. The draft refers back to those records so a manager can investigate a statement.
 
-Show the executed 48-case breakdown and the overall automated test result. Explain one actual failure: a citation could be valid while its claim was false, so the evaluator now requires claim review. Keep software test results separate from model quality and user timing.
+“An important distinction: merged code doesn't automatically mean deployed code. That stronger claim needs its own evidence.”
 
-## Final 25 seconds
+## 1:35–2:35 — Review, approve, and export
 
-State what remains: human-reviewed model scores, observed task timing, and production-grade persistent storage/authentication. Explain the next step: one consenting manager completes a timed task without help, then their corrections become regression cases.
+Compare a report item with its evidence. Review internal actions, tick the review checkbox, acknowledge any warnings, and approve. Download/open the client PDF. Return and edit the summary to an evidence-supported alternative; move focus out of the field.
+
+“I check the wording before approval. The internal action list is separate from the client PDF and Word document.
+
+“All downloads use the stored approved version. Now I'll edit it. The downloads disappear until I review and approve again.
+
+“That check runs below the interface too. Calling the export function directly doesn't bypass approval.”
+
+## 2:35–3:35 — Show messy input and judgment
+
+Choose Mobile and backend mismatch — Week C, load evidence, and generate. Show the blocked finding, source records, and missing deadlines under Internal actions.
+
+“This example is a user-supplied reconstruction, not a live repository. The backend change was merged, but mobile is still blocked on the contract.
+
+“The validator flags these mixed signals for review. They can coexist, so this is a conservative flag—not proof that one source is false.
+
+“The manager must clarify the situation, correct the draft if needed, and record supporting evidence and an explanation. A checkbox alone can't dismiss the block.
+
+“These three actions have owners but no deadlines. The dates remain unconfirmed instead of being invented.”
+
+Do not invent a confirmation to get an approved result. Showing the blocked state is sufficient.
+
+## 3:35–4:25 — Explain tests and learning
+
+Show the saved reliability result and case breakdown.
+
+“The suite passes 82 automated tests, including 48 named scenarios covering messy inputs, API failures, privacy, approval, and exports. These are software tests, not 48 live Claude evaluations.
+
+“One important correction was in my evaluator: a valid citation doesn't prove the sentence is true. I separated citation validity from factual grounding, which now requires claim-by-claim review.
+
+“That lets me explain what the results establish without claiming more than I measured.”
+
+## 4:25–5:00 — Costs, limits, and next step
+
+Return to the free-simulation label.
+
+“Public examples make no paid requests. Live generation requires a budget, reserves an estimated maximum before each attempt, and limits retries. It controls this workflow, not other spending on the Anthropic account.
+
+“Human-reviewed model evaluation, live-source verification, and a timed user session remain outstanding. I haven't measured the 60 percent time-saving target yet.
+
+“The next improvement comes from a manager using it, recording corrections, and turning failures into regression tests.”
 
 ## Interview preparation
 
-Be ready to explain why there is no vector database; why retries are bounded; why approval is version-specific; why the budget keeps uncertain reservations; and why the earlier proxy scores were corrected. Open the relevant function and explain one test in your own words.
+Be ready to explain why there is no vector database, why approval belongs to a report version, why cost reservations remain after uncertain requests, and why valid citations are not factual proof.
+
+“Improving itself” means feedback leads to reviewed code and tests—not automatic production changes. Haiku remains provisional; old proxy scores are not a controlled model comparison. Sensitive-data patterns and conflict detection have limits, and hosted SQLite is not a durable production audit service.

@@ -40,6 +40,17 @@ Google Docs API ----/                                      -> Human review
 
 The live adapters are read-only. Claude receives normalized evidence with stable IDs and returns a structured report. Deterministic checks then verify that cited IDs exist, dates are plausible, action fields are complete, and client text does not contain common secret or personal-data patterns.
 
+The code is split into named runtime layers:
+
+- `deliverybrief/ui/` contains the Streamlit screens.
+- `deliverybrief/services/` coordinates the report run.
+- `deliverybrief/generation/` contains the Claude adapter, demo adapter, prompt/schema, and cost estimate.
+- `deliverybrief/approval/` owns approval, warning acknowledgement, conflict resolution, and edit invalidation.
+- `deliverybrief/persistence/` owns SQLite storage and migrations.
+- `deliverybrief/exporting/` owns email, CSV, JSON, and approval-gated downloads.
+
+See [Developer architecture](docs/developer-architecture.md) for the change guide.
+
 ## Configuration
 
 Set `DELIVERYBRIEF_MODE=live` and provide:
@@ -80,6 +91,7 @@ The expanded catalog contains 48 named workflow cases (36 development and 12 res
 - [Evaluation package source](docs/evaluation-package.md)
 - [Case study source](docs/case-study.md)
 - [AI collaboration note](docs/ai-collaboration-note.md)
+- [Developer architecture](docs/developer-architecture.md)
 - [User interview guide](docs/user-interview.md)
 - [Five-minute demo script](docs/demo-script.md)
 - [Quest control sheet](docs/quest-control.md)

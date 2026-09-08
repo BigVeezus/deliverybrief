@@ -118,7 +118,7 @@ def build(source: str, name: str) -> Path:
             )
     output = ROOT / "output/docx" / f"{name}.docx"
     output.parent.mkdir(parents=True, exist_ok=True)
-    document.save(output)
+    document.save(str(output))
     return output
 
 

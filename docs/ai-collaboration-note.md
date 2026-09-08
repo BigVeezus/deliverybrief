@@ -201,3 +201,28 @@ Verification: executed pytest output feeds `evaluation/results/reliability-v2.js
 Elvis's decisions: client updates stay primary, the public demo stays free, and additional paid model calls require approval. Elvis's final code walkthrough, factual review, and consenting-user observation are still pending. This entry does not claim they happened.
 
 Artifacts: `docs/reliability-upgrade.md`, the expanded tests, and the revised application.
+
+### 8 September 2026 Maintainability refactor
+
+Tool and model: Codex coding agent in this task; no Anthropic API requests.
+
+Delegated: separate the working prototype into clearer runtime layers while preserving the existing
+Streamlit entrypoint and old Python imports.
+
+Accepted in the implementation: generation now lives under `deliverybrief/generation/`, approval
+under `deliverybrief/approval/`, SQLite under `deliverybrief/persistence/`, exports under
+`deliverybrief/exporting/`, workflow orchestration under `deliverybrief/services/`, and the
+Streamlit UI under `deliverybrief/ui/`.
+
+Corrected through inspection and tests: moving Streamlit UI code exposed Python module-caching
+behavior in the test runner, so the root `app.py` now imports or reloads the UI module explicitly.
+Several scripts were changed so importing them does not accidentally execute work.
+
+Verification: the refactor added structure tests and kept the full automated suite passing locally.
+Ruff and mypy were run after the move.
+
+Elvis's decisions: keep this refactor on a review branch until he checks it, because the public demo
+should not change without review during the Quest deadline.
+
+Artifacts: `docs/developer-architecture.md`, `tests/test_project_structure.py`, and the refactored
+package folders.

@@ -82,6 +82,18 @@ Replace the affected credential in the local environment and Streamlit secrets. 
 
 Change the model name through environment configuration. Run the complete evaluation set before making it the default. Update the decision record with the tested version and result.
 
+## Code maintenance
+
+The root `app.py` is only the Streamlit entrypoint. The interface lives in `deliverybrief/ui/`.
+Generation code lives in `deliverybrief/generation/`; approval and export gating live in
+`deliverybrief/approval/`; SQLite storage lives in `deliverybrief/persistence/`; and download
+serializers live in `deliverybrief/exporting/`. The older modules `deliverybrief.generator`,
+`deliverybrief.storage`, `deliverybrief.exports`, and `deliverybrief.workflow` remain as
+compatibility wrappers so existing commands and tests keep working.
+
+Use `docs/developer-architecture.md` before changing shared behavior. It lists the main package
+boundaries and the tests that prove those boundaries still exist.
+
 ## Reliability revision operation
 
 Use “Load evidence” to choose a free scenario. The payment, mobile, and migration weeks are reconstructed examples; the unsafe week is synthetic. “Use your own anonymized evidence” provides pasted notes and JSON upload. Maximum upload size is 2 MB with 200 records. Invalid IDs, duplicate-ID conflicts, and timezone-free timestamps require correction before generation.
@@ -105,4 +117,3 @@ Run records contain version fingerprints, attempts, usage, validation and approv
 ## Verification and handoff
 
 Run `pytest --junitxml=output/reliability-tests.xml`, then `python scripts/summarize_reliability.py`. Run Ruff, mypy, and the secret scanner. Review `docs/user-observation-session.md` with a consenting participant. No paid test is required for the software checks.
-

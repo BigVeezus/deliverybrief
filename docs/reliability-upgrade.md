@@ -12,6 +12,12 @@ The public app provides five free simulations and accepts pasted notes or JSON. 
 
 Source collection is separate for GitHub and each selected note. A failed note can be retried without losing a successful GitHub collection. Both connectors paginate; document tabs and nested table text are supported. Reporting-week GitHub boundaries use the configured timezone. Google modification dates carry a warning because they are not event dates.
 
+The maintainability refactor keeps the same public behavior while separating UI, workflow service,
+generation adapters, approval rules, SQLite persistence, and export serializers. Compatibility
+wrappers preserve older imports so the refactor does not force unrelated test or documentation
+churn. A new structure test checks those package boundaries and confirms helper scripts do not
+execute work at import time.
+
 ## Failure records
 
 ### A valid citation did not prove a true claim

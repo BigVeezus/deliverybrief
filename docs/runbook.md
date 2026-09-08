@@ -28,6 +28,8 @@ Set `DELIVERYBRIEF_MODE=live` and configure:
 
 Create a fine-grained GitHub token with read access only to repository metadata, contents, pull requests, and issues for the selected repository. Create a Google service account, enable Drive and Docs APIs, and share only the project-note folder with its email address as Viewer.
 
+Project notes can be native Google Docs, `.txt`, `.md`, `.csv`, or `.docx` files. Unsupported file types should be converted or pasted into a supported format before collection.
+
 ## Normal weekly operation
 
 1. Choose the Monday and Friday of the reporting period.
@@ -108,7 +110,7 @@ Each browser session has an independent run scope. The default local CLI scope c
 
 ## Budget and diagnostics
 
-Set an explicit positive `DELIVERYBRIEF_BUDGET_USD` for live generation. No budget means no model calls. The `workflow-budget.db` ledger reserves a conservative request maximum before each attempt; uncertain failures keep their reservation. There are no hidden Anthropic SDK retries. Do not delete the ledger to retry a request. Raising its limit requires Elvis's approval.
+Set an explicit positive `DELIVERYBRIEF_BUDGET_USD` for live generation. No budget means no model calls. The `workflow-budget.db` ledger reserves a conservative request maximum before each attempt; uncertain failures keep their reservation. There are no hidden Anthropic SDK retries. Do not delete the ledger to retry a request. Raising its limit requires my approval.
 
 For an alternate model, configure its exact identifier in `ANTHROPIC_PRICED_MODEL` and explicit `ANTHROPIC_MODEL_INPUT_PER_MTOK` and `ANTHROPIC_MODEL_OUTPUT_PER_MTOK` rates after checking provider pricing. Unknown or invalid rates block requests. Historical Haiku pricing assumptions remain configuration-dependent estimates. These application controls do not cap unrelated provider-account spending.
 
@@ -116,4 +118,4 @@ Run records contain version fingerprints, attempts, usage, validation and approv
 
 ## Verification and handoff
 
-Run `pytest --junitxml=output/reliability-tests.xml`, then `python scripts/summarize_reliability.py`. Run Ruff, mypy, and the secret scanner. Review `docs/user-observation-session.md` with a consenting participant. No paid test is required for the software checks.
+Run `python scripts/live_smoke.py --max-cost-usd 0.08` only in a private environment with credentials configured. It writes raw details to ignored `tmp/live-smoke/` and a redacted summary to `evidence/live-smoke/`. Then run `pytest --junitxml=output/reliability-tests.xml`, `python scripts/summarize_reliability.py`, Ruff, mypy, and the secret scanner. Review `docs/user-observation-session.md` with a consenting participant before claiming measured time savings.

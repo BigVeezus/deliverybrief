@@ -18,7 +18,7 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Verification.** I checked the recommendation against the supplied Quest text and the Applied AI Engineer role description.
 
-**Decision I owned.** I selected weekly delivery updates, a delivery manager as the user, GitHub and Google Docs as sources, a public demo, and Anthropic as the funded provider.
+**Decision I owned.** I selected weekly delivery updates, a delivery manager as the user, GitHub plus Drive project notes as sources, a public demo, and Anthropic as the funded provider.
 
 **Artifact.** `docs/decisions.md` and the implementation plan.
 
@@ -62,13 +62,13 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Accepted.** The cleaned note states the workflow, sources, bottleneck, trust conditions, rejection conditions, and examples of information that should not reach a client or MD.
 
-**Rejected or corrected.** I did not present this as a fake external interview. It is recorded as Elvis-provided target-user perspective, with a note that a separate external interview is still useful if time allows.
+**Rejected or corrected.** I did not present this as a fake external interview. It is recorded as my target-user perspective, with a note that a separate external interview is still useful if time allows.
 
 **Verification.** I checked that the note reflects the supplied answers: weekly MD updates, GitHub PRs, developer notes, vague commits, document quality, context handling, consistency, and formatting.
 
 **Decision I owned.** I chose to use this as Day 1 proxy evidence while keeping the limitation visible.
 
-**Artifact.** `evidence/day-1/interview-notes-elvis-proxy.md`.
+**Artifact.** `evidence/day-1/interview-notes-self-perspective.md`.
 
 ### 7 September 2026 Weekly example cleanup
 
@@ -180,7 +180,7 @@ This log records how I used AI during the Quest and how I checked its work. I re
 
 **Decision I owned.** I chose to use this result to explain why DeliveryBrief adds workflow structure around the model instead of only calling Claude.
 
-**Artifact.** `scripts/run_direct_prompt_baseline.py`, `evaluation/results/direct-prompt-haiku.json`, and `evidence/day-2/direct-prompt-baseline-summary.md`.
+**Artifact.** `evaluation/results/direct-prompt-haiku.json` and `evidence/day-2/direct-prompt-baseline-summary.md`.
 
 ## Daily continuation format
 
@@ -188,7 +188,7 @@ For every later use, add the date, task, tool and model, delegated work, accepte
 
 ### 8 September 2026 Reliability revision
 
-Tool and model: Codex coding agent in this task; no new Anthropic API requests. Elvis requested messy samples, tests, documented decisions, client documents, and cost controls.
+Tool and model: Codex coding agent in this task; no new Anthropic API requests. I requested messy samples, tests, documented decisions, client documents, and cost controls.
 
 Delegated: shared approval checks, evidence snapshots, session separation, input validation, connector pagination, 48 named cases, extra boundary/UI tests, document exports, and documentation updates.
 
@@ -196,9 +196,9 @@ Accepted in the implementation: the Python/Streamlit architecture, conservative 
 
 Corrected through inspection and tests: citation validity was mislabeled as grounding; storage approval bypassed UI validation; the phone detector damaged timestamps; “No completed work” triggered completion. These failures are recorded in the reliability log.
 
-Verification: executed pytest output feeds `evaluation/results/reliability-v2.json`. Static checks, browser verification, and rendered-document inspection support the handoff. Automated checks are not user feedback or a live Anthropic benchmark.
+Verification: executed pytest output feeds `evaluation/results/reliability-v2.json`. Static checks, browser verification, and rendered-document inspection support the handoff. These automated checks support reliability; they are not the same thing as a fresh paid Anthropic benchmark or a timed user-adoption study.
 
-Elvis's decisions: client updates stay primary, the public demo stays free, and additional paid model calls require approval. Elvis's final code walkthrough, factual review, and consenting-user observation are still pending. This entry does not claim they happened.
+My decisions: client updates stay primary, the public demo stays free, and additional paid model calls require approval. My final code walkthrough, factual review, and consenting-user observation are still pending. This entry does not claim they happened.
 
 Artifacts: `docs/reliability-upgrade.md`, the expanded tests, and the revised application.
 
@@ -223,8 +223,24 @@ Ruff, mypy, pytest, and the secret scanner were run after the move. After push, 
 exposed a Linux import-path issue in the new structure test. I corrected the test to import helper
 scripts by file path and the final CI run `34189560471` passed.
 
-Elvis's decisions: review the refactor before merging, then keep the public demo on the verified
+My decisions: review the refactor before merging, then keep the public demo on the verified
 `main` branch once local checks and GitHub Actions passed.
 
 Artifacts: `docs/developer-architecture.md`, `tests/test_project_structure.py`, and the refactored
 package folders.
+
+### 8 September 2026 Private live-source smoke and Drive note support
+
+Tool and model: Codex coding agent, local live-smoke harness, GitHub API, Google Drive/Docs APIs, and Claude Haiku 4.5.
+
+Delegated: build a repeatable private smoke test that uses configured credentials, calls GitHub, reads the shared Drive folder, calls Claude only after a budget check, approves through the same approval service, exports from the approved snapshot, and writes only a redacted public summary.
+
+Accepted in the implementation: one live run collected 26 GitHub records and one Drive text note for 7-8 September 2026, called Haiku once under a `$0.08` cap, returned valid structured JSON, produced warnings rather than blocks, approved the reviewed snapshot, and generated six exports.
+
+Corrected through inspection and tests: the first Google attempt found that my uploaded note was a `.txt` file, not a native Google Doc. I changed the Drive adapter to support native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes. The first export attempt also failed because the harness tried to export with evidence that did not match the stored approval snapshot; I changed it to export from stored evidence, which is the correct safety behavior.
+
+Verification: focused integration tests cover text and DOCX extraction. The private live smoke passed after the harness correction. Raw smoke details and exports stay under ignored `tmp/live-smoke/`; the public summary is redacted.
+
+My decision: I will describe this as a private live-source smoke, not a full adoption study. It proves that the configured live path can collect sources, call Claude under a cap, validate, approve, and export without exposing private source text in the repository.
+
+Artifacts: `scripts/live_smoke.py`, `deliverybrief/integrations/google_docs.py`, `tests/test_integrations.py`, and `evidence/live-smoke/live-smoke-summary.md`.

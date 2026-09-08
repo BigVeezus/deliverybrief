@@ -15,7 +15,7 @@ app.py
   deliverybrief/persistence/        SQLite storage and migrations
   deliverybrief/exporting/          Email, CSV, JSON and approved export service
   deliverybrief/report_documents.py PDF and DOCX document rendering
-  deliverybrief/integrations/       Read-only GitHub and Google Docs clients
+  deliverybrief/integrations/       Read-only GitHub and Google Drive/Docs clients
 ```
 
 The root modules `deliverybrief.generator`, `deliverybrief.exports`, `deliverybrief.workflow`,

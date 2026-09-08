@@ -12,6 +12,8 @@ Weekly delivery reporting is recurring and bounded. It also exposes a real misma
 
 On Day 1, I recorded a project/product manager perspective for a manager handling several projects and sending weekly updates to an MD. The recurring problem is that GitHub shows activity, but not always the delivery story. PRs may have vague names, missing descriptions, no issue links, or no connection to developer notes.
 
+I also checked the problem against public research. PMI's communications report ties unclear project communication to project risk. DORA's value-stream guidance tells teams to inspect information flow, wait time, and handoffs. DORA's loosely coupled teams guidance treats cross-team coordination as delivery friction. That matched the pattern in my examples: the git history alone did not explain the state of the work.
+
 ## Previous process
 
 The previous process is manual: open GitHub PRs and issues, read developer notes, reconstruct what actually happened, decide what the MD needs to know, then write a clean update with blockers and action items.
@@ -34,7 +36,9 @@ I kept the scope small so the five-day build includes evaluation, failure handli
 
 ## Design
 
-GitHub and Google Docs adapters convert source records into a shared `EvidenceItem` schema with stable IDs. Claude receives only these normalized records and must attach evidence IDs to every factual report item. Pydantic checks the response structure. Deterministic validation then checks citations, sensitive patterns, missing action fields, empty evidence, instruction-like source text, and explicit conflicts.
+GitHub and Google Drive or Docs adapters convert source records into a shared `EvidenceItem` schema with stable IDs. Claude receives only these normalized records and must attach evidence IDs to every factual report item. Pydantic checks the response structure. Deterministic validation then checks citations, sensitive patterns, missing action fields, empty evidence, instruction-like source text, and explicit conflicts.
+
+The Drive adapter now reads native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes from the configured folder. Unsupported files receive a clear message instead of being treated as evidence.
 
 The Streamlit interface exposes the evidence before generation. After generation, the manager can inspect citations and edit each section. Blocking findings disable approval. Warnings require acknowledgement. Approved reports can be downloaded as an email, CSV, JSON file, and run summary.
 
@@ -56,6 +60,8 @@ Second, the first full Haiku run missed one cross-repository evidence item in ca
 
 Third, case 06 showed that action-like evidence could disappear when the model did not create an action item. I changed the validator so evidence that clearly asks for follow-up is flagged when no owner or due date is present in the draft.
 
+Fourth, the first private live smoke found that an uploaded developer note was a plain text file, not a native Google Doc. I changed the adapter to support common note files from Drive and added a regression for `.docx` text and table extraction.
+
 Focused regressions for case 03 and case 06 passed after the fixes.
 
 ## Results
@@ -73,6 +79,10 @@ The full Haiku run recorded:
 - median latency: 6,444 ms
 
 I also ran a direct-prompt Haiku baseline without DeliveryBrief's evidence IDs, schema enforcement, validation, approval gate, or export record. It returned 1 of 9 under a different keyword audit and cost $0.007295. Because the two audits differ, these pass rates are not a controlled quality comparison. Several outputs were readable, but they were harder to verify because the final text did not preserve stable evidence handling.
+
+On 8 September, I ran a private live-source smoke test. It collected 26 GitHub records and one Google Drive text note, sent the normalized evidence to Claude Haiku once under a `$0.08` cap, and produced a valid structured report. The conservative request estimate was `$0.049441`; actual estimated cost was `$0.018218`; latency was 22,109 ms. The validator returned warnings for document date, missing action owner/date, and redacted source content. There were no blocking findings, so the approval service approved the report after warnings were acknowledged and produced the client PDF, Word document, email, action CSV, report JSON, and run summary.
+
+The first export attempt failed because it used the pre-sanitized evidence list after approval. The export service rejected the mismatch. I fixed the smoke harness to export from the stored evidence snapshot. That failure is useful because it proves approval is tied to an exact report and evidence version.
 
 The time-reduction result is not final yet because I still need an observed user run through the interface and an edit-rate measurement.
 
@@ -96,4 +106,4 @@ Tests caught a phone detector that damaged ISO timestamps and a demo matcher tha
 
 Client updates are the selected primary output. The MD-reporting perspective remains useful problem context, but a real external participant has not yet validated this narrower client workflow. The observed user session and the 60 percent time-saving target remain pending.
 
-The final refactored `main` branch passed GitHub Actions in run `34189560471`. No new paid Anthropic calls were made during the reliability or maintainability revision.
+The final local verification after the live-smoke update passed 87 tests, Ruff, strict mypy, and the secret scan. I use GitHub Actions as the remote verification check, and the refactored `main` branch passed CI after the Linux import-path issue was corrected.

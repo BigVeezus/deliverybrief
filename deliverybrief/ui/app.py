@@ -105,7 +105,7 @@ else:
                 put_source("github", client.collect(period))
         except Exception as error:
             st.session_state.collection_errors["github"] = redact(str(error))
-    if st.button("List Google documents"):
+    if st.button("List Drive notes"):
         try:
             google = GoogleDocsEvidenceClient(
                 settings.google_service_account_json or "",

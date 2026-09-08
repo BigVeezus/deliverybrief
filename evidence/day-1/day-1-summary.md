@@ -5,7 +5,7 @@
 - Quest acceptance time recorded: Monday, 7 September 2026 at 3:00 PM WAT.
 - Erwin confirmed that the Quest timer is active.
 - Public Streamlit deployment opened on phone: `https://deliverybrief.streamlit.app/`.
-- Elvis-provided target-user perspective was recorded.
+- My target-user perspective was recorded.
 - Three anonymized reconstructed weekly examples were collected.
 - Manual baseline time estimates were recorded for the three examples.
 - A separate Day 1 evaluation dataset was created at `evaluation/day1/cases.json`.
@@ -58,7 +58,7 @@ DeliveryBrief needs the Claude structured-output path and deterministic validato
 
 ## Evidence files
 
-- `evidence/day-1/interview-notes-elvis-proxy.md`
+- `evidence/day-1/interview-notes-self-perspective.md`
 - `evidence/day-1/weekly-examples-index.md`
 - `evidence/day-1/baseline-log.csv`
 - `evidence/day-1/screenshots/mobile-public-url.png`

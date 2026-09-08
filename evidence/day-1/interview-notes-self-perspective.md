@@ -3,15 +3,15 @@
 ## Interview details
 
 - Date: Monday, 7 September 2026
-- Format: Elvis-provided target-user perspective, written in chat
+- Format: my target-user perspective, written in chat
 - Target user role: project/product manager handling several projects
 - Reader of weekly updates: Managing Director
 - Recording used: no
-- Consent to quote anonymously: not applicable; this is Elvis's own supplied perspective
+- Consent to quote anonymously: not applicable; this is my own supplied perspective
 
 ## Important boundary
 
-This is not presented as an external user interview. It is a first Day 1 proxy based on Elvis's own understanding of a project/product manager workflow. A separate external user interview is still useful before final submission if time allows.
+This is not presented as an external user interview. It is a first Day 1 proxy based on my own understanding of a project/product manager workflow. A separate external user interview is still useful before final submission if time allows.
 
 ## Workflow summary
 

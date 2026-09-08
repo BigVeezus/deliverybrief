@@ -10,4 +10,4 @@ Use one consenting person who prepares or reviews delivery reports. Explain that
 
 Record date, participant role, consent, source-week provenance, manual start/end, app start/end, interruptions, corrections, help given, and adoption decision. Keep personal identities outside the public repository.
 
-Current status: not yet observed. Elvis's 55, 75, and 40 minute estimates are reconstructed estimates, not timed measurements.
+Current status: not yet observed. My 55, 75, and 40 minute estimates are reconstructed estimates, not timed measurements.

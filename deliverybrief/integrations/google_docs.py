@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from io import BytesIO
 from typing import Any, cast
 
 from google.oauth2 import service_account
@@ -15,6 +16,14 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly",
     "https://www.googleapis.com/auth/documents.readonly",
 ]
+GOOGLE_DOC_MIME = "application/vnd.google-apps.document"
+DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+TEXT_MIMES = {
+    "text/plain": "live_google_drive_text",
+    "text/markdown": "live_google_drive_markdown",
+    "text/csv": "live_google_drive_csv",
+}
+SUPPORTED_NOTE_MIMES = {GOOGLE_DOC_MIME, DOCX_MIME, *TEXT_MIMES}
 
 
 class GoogleDocsIntegrationError(RuntimeError):
@@ -44,15 +53,18 @@ class GoogleDocsEvidenceClient:
         try:
             records: list[dict[str, str]] = []
             page_token = None
+            mime_query = " or ".join(
+                f"mimeType = '{mime_type}'" for mime_type in sorted(SUPPORTED_NOTE_MIMES)
+            )
             for _ in range(20):
                 response = (
                     self.drive.files()
                     .list(
                         q=(
                             f"'{self.folder_id}' in parents and trashed = false and "
-                            "mimeType = 'application/vnd.google-apps.document'"
+                            f"({mime_query})"
                         ),
-                        fields="nextPageToken,files(id,name,modifiedTime,webViewLink)",
+                        fields="nextPageToken,files(id,name,mimeType,modifiedTime,webViewLink)",
                         orderBy="modifiedTime desc",
                         pageSize=100,
                         pageToken=page_token,
@@ -93,6 +105,28 @@ class GoogleDocsEvidenceClient:
                 ) from error
             raise
 
+    @retry(
+        retry=retry_if_exception(_transient_google_error),
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=0.5, min=0.5, max=4),
+        reraise=True,
+    )
+    def _download_file(self, file_id: str) -> bytes:
+        try:
+            content = self.drive.files().get_media(fileId=file_id).execute()
+        except HttpError as error:
+            if error.resp.status in {401, 403, 404}:
+                raise GoogleDocsIntegrationError(
+                    f"Google Drive file {file_id} is unavailable to the service account."
+                ) from error
+            raise
+        if isinstance(content, bytes):
+            return content
+        return str(content or "").encode()
+
+    def _text_file(self, file_id: str) -> str:
+        return self._download_file(file_id).decode("utf-8", errors="replace").strip()
+
     @staticmethod
     def _extract_text(document: dict[str, Any]) -> str:
         parts: list[str] = []
@@ -124,6 +158,19 @@ class GoogleDocsEvidenceClient:
         walk(document.get("tabs") or document)
         return "".join(parts).strip()
 
+    @staticmethod
+    def _extract_docx_text(raw: bytes) -> str:
+        from docx import Document
+
+        document = Document(BytesIO(raw))
+        paragraphs = [paragraph.text for paragraph in document.paragraphs if paragraph.text.strip()]
+        for table in document.tables:
+            for row in table.rows:
+                values = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+                if values:
+                    paragraphs.append(" | ".join(values))
+        return "\n".join(paragraphs).strip()
+
     def collect(self, selected_document_ids: list[str]) -> list[EvidenceItem]:
         available = {item["id"]: item for item in self.list_documents()}
         evidence: list[EvidenceItem] = []
@@ -133,8 +180,24 @@ class GoogleDocsEvidenceClient:
                 raise GoogleDocsIntegrationError(
                     f"Selected document {document_id} is not in the configured folder."
                 )
-            document = self._document(document_id)
-            content = self._extract_text(document)
+            mime_type = metadata.get("mimeType")
+            if mime_type == GOOGLE_DOC_MIME:
+                document = self._document(document_id)
+                content = self._extract_text(document)
+                evidence_id = f"GDOC-{document_id}"
+                ingestion = "live_google_docs"
+            elif mime_type in TEXT_MIMES:
+                content = self._text_file(document_id)
+                evidence_id = f"GDRIVE-TEXT-{document_id}"
+                ingestion = TEXT_MIMES[mime_type]
+            elif mime_type == DOCX_MIME:
+                content = self._extract_docx_text(self._download_file(document_id))
+                evidence_id = f"GDRIVE-DOCX-{document_id}"
+                ingestion = "live_google_drive_docx"
+            else:
+                raise GoogleDocsIntegrationError(
+                    f"Unsupported note type for {metadata['name']}: {mime_type}"
+                )
             if not content:
                 raise GoogleDocsIntegrationError(
                     f"Document {metadata['name']} contains no readable text."
@@ -142,7 +205,7 @@ class GoogleDocsEvidenceClient:
             modified = datetime.fromisoformat(metadata["modifiedTime"].replace("Z", "+00:00"))
             evidence.append(
                 EvidenceItem(
-                    evidence_id=f"GDOC-{document_id}",
+                    evidence_id=evidence_id,
                     source=SourceType.GOOGLE_DOC,
                     title=metadata["name"],
                     content=content,
@@ -151,8 +214,9 @@ class GoogleDocsEvidenceClient:
                     metadata={
                         "kind": "project_note",
                         "document_id": document_id,
+                        "mime_type": mime_type,
                         "timestamp_kind": "document_modified",
-                        "ingestion": "live_google",
+                        "ingestion": ingestion,
                     },
                 )
             )

@@ -2,7 +2,7 @@
 
 Add one section per weekly example. These do not need to be beautiful. They need to be real enough to score the system against.
 
-Status on 7 September 2026: three anonymized reconstructed examples were supplied by Elvis from real operating patterns. They are not public production PRs and should not be described that way. They are public-safe examples designed to preserve the workflow shape without exposing private repositories, client names, staff names, or URLs.
+Status on 7 September 2026: I supplied three anonymized reconstructed examples from real operating patterns. They are not public production PRs and should not be described that way. They are public-safe examples designed to preserve the workflow shape without exposing private repositories, client names, staff names, or URLs.
 
 ## Pattern across the examples
 

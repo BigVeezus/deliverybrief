@@ -164,7 +164,7 @@ def evaluate_report(
         "claims_for_review": claims,
         "expected_facts": case.expected_facts,
         "expected_actions": case.expected_actions,
-        "review_instructions": "Elvis must review every claim, fact and action against evidence. "
+        "review_instructions": "I must review every claim, fact and action against evidence. "
         "A reviewer name and this exact report fingerprint are required.",
     }
     if review is None:
@@ -369,7 +369,7 @@ def main() -> None:
             raise SystemExit(
                 "Estimated cost upper bound "
                 f"{estimated_cost} is unknown or exceeds cap ${args.max_estimated_cost_usd:.6f}. "
-                "Run with a higher cap only if Elvis approves it."
+                "Run with a higher cap only if I approve it."
             )
 
     budget = (

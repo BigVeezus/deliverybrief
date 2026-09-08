@@ -1,4 +1,4 @@
-"""Public, synthetic demonstrations plus Elvis's reconstructed weeks B, C and D."""
+"""Public, synthetic demonstrations plus my reconstructed weeks B, C and D."""
 
 from __future__ import annotations
 

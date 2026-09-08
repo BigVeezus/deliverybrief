@@ -68,7 +68,8 @@ def build_summary(root: Path) -> dict[str, object]:
         },
         "results": results,
         "limitations": [
-            "Contract tests do not measure Anthropic quality or real user adoption.",
+            "Contract tests measure workflow behavior, not timed user adoption or live model "
+            "quality.",
             "Cases and implementation were AI-assisted, not independently authored.",
             "The 12 reserved cases passed their first executed assertions; "
             "reused runs are regressions.",

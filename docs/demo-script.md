@@ -4,7 +4,7 @@ Rehearsal script for the current app, before the proposed refactor. Timings incl
 
 ## Before recording
 
-Open the public app on Normal delivery week, the latest client PDF, and evaluation/results/reliability-v2.json in separate tabs. Use free simulation; no paid model request is needed. Close private tabs and credential pages. Refresh the results section only after additional checks have actually happened.
+Open the public app on Normal delivery week, the latest client PDF, `evaluation/results/reliability-v2.json`, and `evidence/live-smoke/live-smoke-summary.md` in separate tabs. Use the free public simulation in the browser. Do not show private credential pages or raw live-smoke files.
 
 ## 0:00–0:40 — Explain the problem
 
@@ -20,7 +20,7 @@ Show the application title.
 
 Click Load evidence, open Inspect evidence and context, show a GitHub-labeled record and a developer note, then Generate weekly brief.
 
-“This public walkthrough uses labeled samples and a free, rule-based simulation. It isn't calling Claude. The separate live mode connects to GitHub, Google Docs, and Anthropic.
+“This public walkthrough uses labeled samples and a free, rule-based simulation. It isn't calling Claude. I also ran the private live path with GitHub, a Drive note, Google Docs access, and Claude Haiku under a budget cap.
 
 “Each record keeps its source, timestamp, and evidence ID. The draft refers back to those records so a manager can investigate a statement.
 
@@ -54,7 +54,7 @@ Do not invent a confirmation to get an approved result. Showing the blocked stat
 
 Show the saved reliability result and case breakdown.
 
-“The suite passes 82 automated tests, including 48 named scenarios covering messy inputs, API failures, privacy, approval, and exports. These are software tests, not 48 live Claude evaluations.
+“The suite passes automated tests covering 48 named scenarios, messy inputs, API failures, privacy, approval, exports, and Drive note formats. These are software tests, not 48 live Claude evaluations.
 
 “One important correction was in my evaluator: a valid citation doesn't prove the sentence is true. I separated citation validity from factual grounding, which now requires claim-by-claim review.
 
@@ -66,7 +66,7 @@ Return to the free-simulation label.
 
 “Public examples make no paid requests. Live generation requires a budget, reserves an estimated maximum before each attempt, and limits retries. It controls this workflow, not other spending on the Anthropic account.
 
-“Human-reviewed model evaluation, live-source verification, and a timed user session remain outstanding. I haven't measured the 60 percent time-saving target yet.
+“The private live smoke collected 26 GitHub records and one Drive note, called Claude once, approved the validated report, and exported six files. I still have not measured the 60 percent time-saving target with another user.
 
 “The next improvement comes from a manager using it, recording corrections, and turning failures into regression tests.”
 

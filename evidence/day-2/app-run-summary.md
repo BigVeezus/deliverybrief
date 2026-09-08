@@ -6,7 +6,7 @@
 - App URL: `https://deliverybrief.streamlit.app/`
 - Mode: sample evidence
 - Project: Northstar Portal
-- Runner: Elvis
+- Runner: me
 - Run ID: `5d79a5da-73cb-4168-b758-fbde44a56b31`
 - Reporting period: 2026-08-31 to 2026-09-04
 
@@ -20,7 +20,7 @@
 
 ## Result
 
-The app generated a weekly delivery update from five sample evidence records. Elvis reviewed the output, approved the report, and exported the client email, action CSV, report JSON, and run summary.
+The app generated a weekly delivery update from five sample evidence records. I reviewed the output, approved the report, and exported the client email, action CSV, report JSON, and run summary.
 
 The run summary records:
 

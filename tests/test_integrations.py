@@ -1,5 +1,8 @@
+from io import BytesIO
+
 import httpx
 import pytest
+from docx import Document
 
 from deliverybrief.integrations.github import GitHubEvidenceClient
 from deliverybrief.integrations.google_docs import GoogleDocsEvidenceClient
@@ -68,3 +71,43 @@ def test_google_document_text_extraction() -> None:
     }
 
     assert GoogleDocsEvidenceClient._extract_text(document) == "Delivery note\nSecond line"
+
+
+def test_google_plain_text_note_extraction() -> None:
+    client = GoogleDocsEvidenceClient.__new__(GoogleDocsEvidenceClient)
+    client.drive = type(
+        "Drive",
+        (),
+        {
+            "files": lambda self: type(
+                "Files",
+                (),
+                {
+                    "get_media": lambda self, fileId: type(
+                        "Request",
+                        (),
+                        {"execute": lambda self: b"Developer note\nSecond line"},
+                    )()
+                },
+            )()
+        },
+    )()
+
+    assert client._text_file("note-id") == "Developer note\nSecond line"
+
+
+def test_google_docx_note_extraction() -> None:
+    document = Document()
+    document.add_paragraph("Developer 1")
+    document.add_paragraph("Bulk upload validation is mostly complete.")
+    table = document.add_table(rows=1, cols=2)
+    table.rows[0].cells[0].text = "Blocker"
+    table.rows[0].cells[1].text = "Old queued jobs need a release decision."
+    raw = BytesIO()
+    document.save(raw)
+
+    text = GoogleDocsEvidenceClient._extract_docx_text(raw.getvalue())
+
+    assert "Developer 1" in text
+    assert "Bulk upload validation is mostly complete." in text
+    assert "Blocker | Old queued jobs need a release decision." in text

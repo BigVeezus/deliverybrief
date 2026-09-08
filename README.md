@@ -14,7 +14,7 @@ The name is deliberately plain. **Delivery** names the manager's responsibility.
 
 The same workflow is available as `make install`, `make check`, and `make run`.
 
-Demo mode requires no private credentials. It uses labeled sample evidence and a deterministic generator so reviewers can exercise collection, validation, editing, approval, and export. Live mode uses the same domain objects and activates GitHub, Google Docs, and Claude through environment variables.
+Demo mode requires no private credentials. It uses labeled sample evidence and a deterministic generator so reviewers can exercise collection, validation, editing, approval, and export. Live mode uses the same domain objects and activates GitHub, Drive notes, Google Docs, and Claude through environment variables.
 
 ## What the manager does
 
@@ -34,7 +34,7 @@ The application never sends email or changes GitHub or Google Drive.
 ```text
 GitHub REST API ----\
                      > Evidence records -> Report generation -> Validation
-Google Docs API ----/                                      -> Human review
+Google Drive/Docs --/                                      -> Human review
                                                                -> Exports
 ```
 
@@ -56,11 +56,14 @@ See [Developer architecture](docs/developer-architecture.md) for the change guid
 Set `DELIVERYBRIEF_MODE=live` and provide:
 
 - `ANTHROPIC_API_KEY`
+- `DELIVERYBRIEF_BUDGET_USD`
 - `GITHUB_TOKEN` with read-only access to the configured repository
 - `GITHUB_REPOSITORY` in `owner/repository` form
 - `GOOGLE_SERVICE_ACCOUNT_JSON`, either inline JSON or a path to the JSON file
 - `GOOGLE_DRIVE_FOLDER_ID` shared with the service account as Viewer
 - `DELIVERYBRIEF_REPOSITORY_URL` set to the public source repository before deployment
+
+The Drive adapter reads native Google Docs plus `.txt`, `.md`, `.csv`, and `.docx` notes from the configured folder. Other file types receive a clear unsupported-type message instead of being treated as evidence.
 
 The model names are configuration rather than code constants. This keeps the evaluation reproducible if account access differs from the default model names.
 
@@ -74,7 +77,9 @@ pytest --junitxml=output/reliability-tests.xml
 python scripts/summarize_reliability.py
 ```
 
-The expanded catalog contains 48 named workflow cases (36 development and 12 reserved), plus boundary and Streamlit tests. Executed results are in `evaluation/results/reliability-v2.json`. These free tests do not measure model quality. Earlier files preserve a 1/9 direct-prompt result and 9/9 structured-workflow result under different proxy scorers; these are not a controlled comparison of factual quality. Evaluation v2 separates citation validity from human-reviewed factual grounding, expected-fact coverage, and action accuracy. Unreviewed reports remain `awaiting_review`.
+The expanded catalog contains 48 named workflow cases (36 development and 12 reserved), plus boundary, integration, structure, and Streamlit tests. The current local suite has 87 passing tests, and executed results are in `evaluation/results/reliability-v2.json`. These tests measure workflow behavior: intake, validation, approval, exports, privacy patterns, and failure handling. Earlier files preserve a 1/9 direct-prompt result and 9/9 structured-workflow result under different proxy scorers; those pass rates are historical learning evidence, not a controlled factual-quality comparison. Evaluation v2 separates citation validity from human-reviewed factual grounding, expected-fact coverage, and action accuracy.
+
+The private live smoke test collected 26 GitHub records and one Google Drive note, called Claude Haiku once under a `$0.08` cap, approved the validated report, and produced six export files. The public summary is in `evidence/live-smoke/live-smoke-summary.md`; raw source text remains ignored under `tmp/live-smoke/`.
 
 ## Important limits
 

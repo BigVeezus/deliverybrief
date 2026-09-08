@@ -16,7 +16,7 @@ Decision: separate citation validity from human-reviewed factual grounding.
 Context and evidence: existing IDs did not establish that their cited claims were true.
 Alternatives: keep the proxy, add another model judge, or use explicit claim review.
 Chosen option and reason: claim review tied to an exact report fingerprint makes the judgment inspectable without new model spending.
-Trade-off: semantic results remain pending until Elvis performs the review.
+Trade-off: semantic results remain pending until I complete the claim review.
 Revisit when: enough independently reviewed reports exist to validate an automated judge.
 
 ## 17 Reserve costs before requests
@@ -40,7 +40,7 @@ Revisit when: consenting users provide enough anonymized observed cases.
 ## 19 Client documents and public cost
 
 Decision: client updates remain primary, with PDF/Word/email exports and a separate internal action list.
-Context and evidence: Elvis selected client-first and asked for stable document formatting.
+Context and evidence: I selected client-first output and treated stable document formatting as a trust requirement.
 Alternatives: MD-first output, a custom frontend, or extending the existing Streamlit workflow.
 Chosen option and reason: extend the existing workflow and keep the public demo free.
 Trade-off: the proxy MD context still needs validation with a client-reporting user.
@@ -90,13 +90,13 @@ This record explains the choices I made while defining and building DeliveryBrie
 
 **Revisit when.** User testing finds the name confusing or the product expands beyond weekly delivery reporting.
 
-## 4 GitHub and Google Docs
+## 4 GitHub and Google Drive project notes
 
-**Context and evidence.** GitHub contains delivery activity and status. Google Docs contains meeting context, decisions, risks, and client language. The candidate has confirmed that both are used in the target workflow; the interview must still document the exact sequence.
+**Context and evidence.** GitHub contains delivery activity and status. Project notes contain meeting context, decisions, risks, and client language. I verified the private live path with GitHub plus one Drive note, and updated the adapter after a real `.txt` upload exposed that notes are not always native Google Docs.
 
-**Alternatives considered.** Slack, Jira, and manual file upload.
+**Alternatives considered.** Slack, Jira, native Google Docs only, and manual file upload.
 
-**Decision.** I use GitHub and Google Docs as read-only sources.
+**Decision.** I use GitHub and Google Drive project notes as read-only sources. Native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes are supported in the configured folder.
 
 **Reason.** Together they test reconciliation between structured system activity and less structured human judgment.
 

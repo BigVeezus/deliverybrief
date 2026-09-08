@@ -2,7 +2,7 @@
 
 ## Cost rule from this point
 
-Use Haiku for normal evaluation and development runs. Do not run Sonnet again unless Elvis explicitly approves it for a small, named comparison.
+Use Haiku for normal evaluation and development runs. Do not run Sonnet again unless I explicitly approve it for a small, named comparison.
 
 Before any paid evaluation run, use `--estimate-only` first. When running a paid evaluation, use `--max-estimated-cost-usd` so the command exits before calling Anthropic if the estimate is above the approved cap.
 
@@ -25,7 +25,7 @@ The first clean Haiku run passed all three Day 1 reconstructed cases and cost ab
 
 Total recorded Haiku cost: $0.015467.
 
-An earlier Sonnet attempt completed two cases before a schema/output issue made the result unsuitable as official evidence. A later Sonnet rerun was stopped after Elvis asked to cap costs.
+An earlier Sonnet attempt completed two cases before a schema/output issue made the result unsuitable as official evidence. A later Sonnet rerun was stopped after I asked to cap costs.
 
 ## Estimate commands
 
@@ -88,4 +88,4 @@ Haiku fixed the action-splitting weakness seen in the deterministic demo generat
 
 ## Remaining model work
 
-Before final submission, run or document the direct-prompt baseline. Only run Sonnet if Elvis explicitly approves the extra cost for a named comparison.
+Before final submission, run or document the direct-prompt baseline. Only run Sonnet if I explicitly approve the extra cost for a named comparison.

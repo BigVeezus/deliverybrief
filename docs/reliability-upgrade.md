@@ -1,6 +1,6 @@
 # DeliveryBrief reliability upgrade
 
-This revision strengthens the client-update workflow and corrects how its results are described. It adds automated workflow tests, evidence snapshots, approval checks below the interface, session isolation, source recovery, and client PDF and Word exports. It does not establish real-user adoption or a new live-model quality result.
+This revision strengthens the client-update workflow and corrects how its results are described. It adds automated workflow tests, evidence snapshots, approval checks below the interface, session isolation, source recovery, live-smoke evidence, and client PDF and Word exports.
 
 ## What changed and why
 
@@ -10,7 +10,7 @@ Approval previously depended on interface checks. The shared store now requires 
 
 The public app provides five free simulations and accepts pasted notes or JSON. Every uploaded record is labeled as user supplied. IDs are namespaced for live repositories and documents. Conflicting duplicate IDs stop intake. Records explicitly assigned to other projects are excluded; ambiguous dependencies remain visible for review.
 
-Source collection is separate for GitHub and each selected note. A failed note can be retried without losing a successful GitHub collection. Both connectors paginate; document tabs and nested table text are supported. Reporting-week GitHub boundaries use the configured timezone. Google modification dates carry a warning because they are not event dates.
+Source collection is separate for GitHub and each selected note. A failed note can be retried without losing a successful GitHub collection. Both connectors paginate; Google Docs tabs, Drive text notes, Markdown, CSV, and DOCX text/table content are supported. Reporting-week GitHub boundaries use the configured timezone. Google modification dates carry a warning because they are not event dates.
 
 The maintainability refactor keeps the same public behavior while separating UI, workflow service,
 generation adapters, approval rules, SQLite persistence, and export serializers. Compatibility
@@ -36,6 +36,10 @@ Observed failure during implementation: a serialized ISO timestamp was mistaken 
 
 Observed failure in normal-quiet: “No completed work this week” was classified as completed work. The completion matcher now respects that negation. Additional cases cover “not completed” and reverted work. This remains a limited deterministic simulation, not a general language-understanding engine.
 
+### Uploaded notes were not always Google Docs
+
+Observed failure in the first private live smoke: Google Drive listed the uploaded developer note as `text/plain`, so the old adapter did not collect it. I added support for native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes while keeping unsupported files explicit. A DOCX extraction test covers paragraphs and table cells.
+
 ## Evidence and limitations
 
 The executable catalog contains 48 workflow cases, split into 36 development and 12 reserved cases before the first expanded run. Additional boundary and Streamlit tests exercise state changes, model failures, and repeated generation. The machine-readable result is evaluation/results/reliability-v2.json; its pass counts come from pytest XML.
@@ -44,4 +48,4 @@ The reserved cases are not an independently authored benchmark. Their first exec
 
 Secrets and personal data matching supported patterns are masked before model submission and checked again in outputs. This cannot detect every sensitive fact or adversarial instruction. Human client-suitability review remains mandatory. Hosted SQLite files and budget reservations may be lost on redeployment; persistent storage is required before production use.
 
-No paid Anthropic requests were made for this upgrade. Live GitHub/Google credentials, model-quality review, observed time savings, and a consenting user's adoption session remain separate verification tasks.
+The private live smoke used one Haiku request under a `$0.08` cap. It collected 26 GitHub records and one Drive note, produced an approved report, and exported six files. Model-quality review, observed time savings, and a consenting user's adoption session remain separate verification tasks.

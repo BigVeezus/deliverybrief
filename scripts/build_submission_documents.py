@@ -52,7 +52,7 @@ def build(source: str, name: str) -> Path:
             continue
         if line.startswith("# "):
             document.add_paragraph(plain(line[2:]), "Title")
-            document.add_paragraph("Prepared for Elvis's review | 8 September 2026")
+            document.add_paragraph("Prepared for final Quest submission | 8 September 2026")
         elif line.startswith("##"):
             level = len(line) - len(line.lstrip("#")) - 1
             document.add_heading(plain(line.lstrip("# ")), level=min(level, 3))

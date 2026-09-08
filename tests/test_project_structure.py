@@ -38,9 +38,9 @@ def test_legacy_imports_still_resolve() -> None:
 
 def test_scripts_are_import_safe() -> None:
     for path in (
-        Path("scripts/apply_quality_reviews.py"),
-        Path("scripts/build_sample_documents.py"),
         Path("scripts/build_submission_documents.py"),
+        Path("scripts/check_secrets.py"),
+        Path("scripts/live_smoke.py"),
         Path("scripts/summarize_reliability.py"),
     ):
         spec = importlib.util.spec_from_file_location(path.stem, path)

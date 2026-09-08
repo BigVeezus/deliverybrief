@@ -255,7 +255,7 @@ Accepted in the implementation: I kept orchestration explicit in Python. The app
 
 Rejected or corrected: I did not add LangGraph, CrewAI, n8n, or another orchestration framework this late because that would add integration risk without improving the reviewer’s ability to inspect this five-day workflow. I also corrected the trace redactor so private GitHub/Drive/Docs URLs do not appear in trace output.
 
-Verification: 97 pytest tests passed, including new tests for demo/live tool selection, missing-budget behavior, Drive and user-supplied source labels, generation/validation/approval/export traces, edit-after-approval invalidation, trace redaction, safe script import, and the estimate-only live-smoke path. Ruff and strict mypy passed after the change.
+Verification: 97 pytest tests passed, including new tests for demo/live tool selection, missing-budget behavior, Drive and user-supplied source labels, generation/validation/approval/export traces, edit-after-approval invalidation, trace redaction, safe script import, and the estimate-only live-smoke path. Ruff, strict mypy, the secret scan, and GitHub Actions run `34221962129` passed after the change.
 
 My decision: I will explain this as workflow orchestration implemented directly in Python: tool selection, state, retries, validation, approval gates, trace logging, and reproducible exports. I will not pretend that using a framework name is the same thing as building a reliable workflow.
 

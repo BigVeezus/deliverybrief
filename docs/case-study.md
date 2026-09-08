@@ -110,4 +110,4 @@ Tests caught a phone detector that damaged ISO timestamps and a demo matcher tha
 
 Client updates are the selected primary output. The MD-reporting perspective remains useful problem context, but a real external participant has not yet validated this narrower client workflow. The observed user session and the 60 percent time-saving target remain pending.
 
-The final local verification after the trace upgrade passed 97 tests, Ruff, strict mypy, and the secret scan. I use GitHub Actions as the remote verification check, and the refactored `main` branch passed CI after the Linux import-path issue was corrected.
+The final local verification after the trace upgrade passed 97 tests, Ruff, strict mypy, and the secret scan. I use GitHub Actions as the remote verification check; the trace-upgraded `main` branch passed CI in run `34221962129`.

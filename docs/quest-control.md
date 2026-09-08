@@ -40,6 +40,13 @@ Use this as the single checklist for the active Quest. Evidence links and result
 - [ ] Record the Loom, test it while logged out, and verify the five-minute limit.
 - [ ] Attach all five deliverables, open each from the portal, and capture the success screen.
 
-## Daily rule
+## 8 September reliability checkpoint
+
+- Implemented version-bound approval, source snapshots, scoped sessions, conservative budget reservations, upload/paste intake, five free examples, and client PDF/DOCX exports.
+- Free verification: 82 tests passed, including 48 named scenarios. The split is 36 development / 12 initially held-out cases; these are software checks, not a live model benchmark.
+- Rebuilt submission documents for Elvis's review. Earlier "grounding" scores are legacy citation proxies, not verified factual accuracy. See `docs/evaluation-package.md` for the corrected metric definitions.
+- Still required: live source credential smoke checks, human claim review, one consenting timed user observation, Elvis's final review, public deployment check, Loom, and portal submission. No new paid calls are authorized.
+
+## Daily backup rule
 
 Push an auditable commit and keep a local backup at the end of each day. The portal does not require daily uploads. Upload the final attachments only after they are stable and verified.

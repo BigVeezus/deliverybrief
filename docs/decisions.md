@@ -1,5 +1,51 @@
 # DeliveryBrief Decision Record
 
+
+## 15 Approval belongs below the interface
+
+Decision: approve and export through the shared store using immutable evidence and report fingerprints.
+Context and evidence: the old storage method could approve without running the UI validator.
+Alternatives: trust the disabled button, or revalidate the stored snapshot.
+Chosen option and reason: revalidate, so direct calls receive the same checks.
+Trade-off: legacy runs without evidence snapshots require regeneration.
+Revisit when: a persistent authenticated service replaces local SQLite.
+
+## 16 Correct the quality metrics
+
+Decision: separate citation validity from human-reviewed factual grounding.
+Context and evidence: existing IDs did not establish that their cited claims were true.
+Alternatives: keep the proxy, add another model judge, or use explicit claim review.
+Chosen option and reason: claim review tied to an exact report fingerprint makes the judgment inspectable without new model spending.
+Trade-off: semantic results remain pending until Elvis performs the review.
+Revisit when: enough independently reviewed reports exist to validate an automated judge.
+
+## 17 Reserve costs before requests
+
+Decision: require a budget, exact known pricing, and a persistent reservation before every paid attempt.
+Context and evidence: a per-run estimate alone did not limit retries or concurrent sessions.
+Alternatives: UI-only warnings, provider-only limits, or application reservations.
+Chosen option and reason: transactional reservations constrain this workflow; provider controls remain separate.
+Trade-off: uncertain failures keep their full reservation, and hosted redeployment is not durable.
+Revisit when: a paid pilot has persistent storage and provider-level operational controls.
+
+## 18 Messy sample and test boundaries
+
+Decision: maintain 48 named workflow cases and disclose their synthetic provenance and reserved split.
+Context and evidence: ordinary demo data missed negation, duplicates, and approval-state problems.
+Alternatives: more normal examples or targeted cases plus invariance tests.
+Chosen option and reason: targeted contracts test outcomes that are costly when wrong.
+Trade-off: passing fixtures does not establish general semantic reliability.
+Revisit when: consenting users provide enough anonymized observed cases.
+
+## 19 Client documents and public cost
+
+Decision: client updates remain primary, with PDF/Word/email exports and a separate internal action list.
+Context and evidence: Elvis selected client-first and asked for stable document formatting.
+Alternatives: MD-first output, a custom frontend, or extending the existing Streamlit workflow.
+Chosen option and reason: extend the existing workflow and keep the public demo free.
+Trade-off: the proxy MD context still needs validation with a client-reporting user.
+Revisit when: observed user sessions identify a different primary audience.
+
 This record explains the choices I made while defining and building DeliveryBrief. I record the constraint and the trade-off so I can defend each choice and change it when the evidence changes.
 
 ## 1 Weekly delivery updates
@@ -197,4 +243,3 @@ This record explains the choices I made while defining and building DeliveryBrie
 **Trade-off.** The initial ten-case sample is too small for a broad reliability claim.
 
 **Revisit when.** Real-user results show that these thresholds do not predict acceptable reports.
-

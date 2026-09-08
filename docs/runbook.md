@@ -82,3 +82,27 @@ Replace the affected credential in the local environment and Streamlit secrets. 
 
 Change the model name through environment configuration. Run the complete evaluation set before making it the default. Update the decision record with the tested version and result.
 
+## Reliability revision operation
+
+Use “Load evidence” to choose a free scenario. The payment, mobile, and migration weeks are reconstructed examples; the unsafe week is synthetic. “Use your own anonymized evidence” provides pasted notes and JSON upload. Maximum upload size is 2 MB with 200 records. Invalid IDs, duplicate-ID conflicts, and timezone-free timestamps require correction before generation.
+
+In live mode, collect GitHub and selected Google notes separately. A failed note leaves other sources intact. Retry the failed source button. Changing the reporting period clears stale selections. Single-source continuation requires acknowledgement.
+
+Resolve a conflict by comparing all cited sources, correcting the report, selecting supporting evidence, and recording an explanation of at least 20 characters. The resolution becomes an acknowledged warning; a secret or invalid citation remains blocking. This is a human decision record, not automated semantic proof.
+
+Approve only after checking each claim and client suitability. Editing an approved report or changing evidence clears approval. Download only the approved snapshot. Internal actions are not in client PDF/Word documents.
+
+Each browser session has an independent run scope. The default local CLI scope can read legacy records, but legacy records without evidence snapshots must be regenerated before approval. Do not use hosted SQLite as a durable audit archive. Back up approved exports; production requires persistent storage and authentication.
+
+## Budget and diagnostics
+
+Set an explicit positive `DELIVERYBRIEF_BUDGET_USD` for live generation. No budget means no model calls. The `workflow-budget.db` ledger reserves a conservative request maximum before each attempt; uncertain failures keep their reservation. There are no hidden Anthropic SDK retries. Do not delete the ledger to retry a request. Raising its limit requires Elvis's approval.
+
+For an alternate model, configure its exact identifier in `ANTHROPIC_PRICED_MODEL` and explicit `ANTHROPIC_MODEL_INPUT_PER_MTOK` and `ANTHROPIC_MODEL_OUTPUT_PER_MTOK` rates after checking provider pricing. Unknown or invalid rates block requests. Historical Haiku pricing assumptions remain configuration-dependent estimates. These application controls do not cap unrelated provider-account spending.
+
+Run records contain version fingerprints, attempts, usage, validation and approval information. SQLite `audit_events` records generation failures by error type without raw provider content. Public app logs are temporary. Rotate a leaked key in its provider console, replace the configured secret, and restart the private live instance.
+
+## Verification and handoff
+
+Run `pytest --junitxml=output/reliability-tests.xml`, then `python scripts/summarize_reliability.py`. Run Ruff, mypy, and the secret scanner. Review `docs/user-observation-session.md` with a consenting participant. No paid test is required for the software checks.
+

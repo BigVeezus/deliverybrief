@@ -42,9 +42,15 @@ def test_store_round_trip_and_approval(tmp_path) -> None:
         status=approval_status(findings),
     )
     store = RunStore(tmp_path / "runs.db")
-    store.save(record, generated.report)
+    store.save(record, generated.report, demo_evidence())
 
     loaded = store.get("run-1")
     assert loaded is not None
-    approved = store.approve("run-1", generated.report, edits_made=False)
+    approved = store.approve(
+        "run-1",
+        generated.report,
+        edits_made=False,
+        client_reviewed=True,
+        acknowledged=[f.code for f in findings],
+    )
     assert approved.status == ApprovalStatus.APPROVED

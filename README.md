@@ -23,7 +23,7 @@ Demo mode requires no private credentials. It uses labeled sample evidence and a
 3. Generate a draft.
 4. Review citations and warnings.
 5. Edit and approve the report.
-6. Download the client email, action CSV, JSON record, and run summary.
+6. Download the client PDF, Word document, email, internal action CSV, JSON, and run summary.
 
 The application never sends email or changes GitHub or Google Drive.
 
@@ -59,10 +59,11 @@ Run:
 
 ```bash
 python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --estimate-only
-python -m deliverybrief.evaluation --dataset evaluation/cases --model primary --max-estimated-cost-usd 0.30
+pytest --junitxml=output/reliability-tests.xml
+python scripts/summarize_reliability.py
 ```
 
-The repository contains ten labeled cases, expected behavior, deterministic checks, and an output location for measured results. The direct-prompt Haiku baseline passed 1 of 9 scored report cases under automated audit. The latest capped DeliveryBrief Haiku run passed 9 of 9 scored report cases; the transient API case is covered by an automated integration test. The nine paid DeliveryBrief cases cost an estimated $0.025316. See `docs/evaluation-package.md` for the method and `docs/evidence-needed.md` for the remaining evidence checklist.
+The expanded catalog contains 48 named workflow cases (36 development and 12 reserved), plus boundary and Streamlit tests. Executed results are in `evaluation/results/reliability-v2.json`. These free tests do not measure model quality. Earlier files preserve a 1/9 direct-prompt result and 9/9 structured-workflow result under different proxy scorers; these are not a controlled comparison of factual quality. Evaluation v2 separates citation validity from human-reviewed factual grounding, expected-fact coverage, and action accuracy. Unreviewed reports remain `awaiting_review`.
 
 ## Important limits
 
@@ -86,3 +87,11 @@ The repository contains ten labeled cases, expected behavior, deterministic chec
 - [Evaluation Package PDF](output/pdf/DeliveryBrief-Evaluation-Package.pdf)
 - [Case Study PDF](output/pdf/DeliveryBrief-Case-Study.pdf)
 - [AI Collaboration Note PDF](output/pdf/DeliveryBrief-AI-Collaboration-Note.pdf)
+
+## Reliability revision
+
+Choose among five free examples, paste developer notes, or upload up to 2 MB and 200 evidence records. Uploads are clearly labeled user supplied. Client PDF and Word exports exclude internal actions and source URLs. Approval is enforced against stored evidence and report versions; edits require reapproval.
+
+Live generation additionally requires `DELIVERYBRIEF_BUDGET_USD`. The budget ledger reserves conservative request costs before each attempt. Unknown pricing fails closed. It does not control spending by other applications. Hosted local files can disappear on redeployment; keep the public demo free and use durable storage before a sustained paid pilot.
+
+See [Reliability changes and failures](docs/reliability-upgrade.md) and [User timing session](docs/user-observation-session.md).

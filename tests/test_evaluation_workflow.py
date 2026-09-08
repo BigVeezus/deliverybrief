@@ -27,9 +27,10 @@ def test_evaluation_dataset_and_demo_run() -> None:
 
     assert len(cases) == 10
     assert summary["scored_cases"] == 9
-    assert summary["passed_cases"] >= 9
+    assert summary["passed_cases"] == 0
+    assert summary["awaiting_review"] == 9
     assert all(
-        "missing_expected_evidence_ids" in item
+        "claims_for_review" in item
         for item in summary["results"]
         if item["status"] in {"passed", "failed"}
     )
@@ -133,9 +134,9 @@ def test_evidence_flagged_by_validator_counts_as_handled() -> None:
 
     result = evaluate_report(case, report, findings, 1, 0.0)
 
-    assert result["status"] == "passed"
-    assert result["coverage"] == 1.0
-    assert result["missing_expected_evidence_ids"] == []
+    assert result["status"] == "awaiting_review"
+    assert result["coverage"] is None
+    assert result["citation_validity"] == 1.0
 
 
 def test_workflow_records_generated_run(tmp_path) -> None:

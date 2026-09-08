@@ -42,18 +42,29 @@ class GoogleDocsEvidenceClient:
     )
     def list_documents(self) -> list[dict[str, str]]:
         try:
-            response = (
-                self.drive.files()
-                .list(
-                    q=(
-                        f"'{self.folder_id}' in parents and trashed = false and "
-                        "mimeType = 'application/vnd.google-apps.document'"
-                    ),
-                    fields="files(id,name,modifiedTime,webViewLink)",
-                    orderBy="modifiedTime desc",
-                    pageSize=100,
+            records: list[dict[str, str]] = []
+            page_token = None
+            for _ in range(20):
+                response = (
+                    self.drive.files()
+                    .list(
+                        q=(
+                            f"'{self.folder_id}' in parents and trashed = false and "
+                            "mimeType = 'application/vnd.google-apps.document'"
+                        ),
+                        fields="nextPageToken,files(id,name,modifiedTime,webViewLink)",
+                        orderBy="modifiedTime desc",
+                        pageSize=100,
+                        pageToken=page_token,
+                    )
+                    .execute()
                 )
-                .execute()
+                records.extend(response.get("files", []))
+                page_token = response.get("nextPageToken")
+                if not page_token:
+                    return records
+            raise GoogleDocsIntegrationError(
+                "Folder exceeds the document limit. Use a smaller folder."
             )
         except HttpError as error:
             if error.resp.status in {401, 403, 404}:
@@ -62,7 +73,6 @@ class GoogleDocsEvidenceClient:
                     "as Viewer."
                 ) from error
             raise
-        return list(response.get("files", []))
 
     @retry(
         retry=retry_if_exception(_transient_google_error),
@@ -72,7 +82,9 @@ class GoogleDocsEvidenceClient:
     )
     def _document(self, document_id: str) -> dict[str, Any]:
         try:
-            response = self.docs.documents().get(documentId=document_id).execute()
+            response = (
+                self.docs.documents().get(documentId=document_id, includeTabsContent=True).execute()
+            )
             return cast(dict[str, Any], response)
         except HttpError as error:
             if error.resp.status in {401, 403, 404}:
@@ -84,20 +96,32 @@ class GoogleDocsEvidenceClient:
     @staticmethod
     def _extract_text(document: dict[str, Any]) -> str:
         parts: list[str] = []
-        for block in document.get("body", {}).get("content", []):
-            paragraph = block.get("paragraph")
-            if paragraph:
-                for element in paragraph.get("elements", []):
-                    text_run = element.get("textRun")
-                    if text_run:
-                        parts.append(text_run.get("content", ""))
-            table = block.get("table")
-            if table:
-                for row in table.get("tableRows", []):
-                    for cell in row.get("tableCells", []):
-                        for cell_block in cell.get("content", []):
-                            for element in cell_block.get("paragraph", {}).get("elements", []):
-                                parts.append(element.get("textRun", {}).get("content", ""))
+
+        def walk(node: Any) -> None:
+            if isinstance(node, list):
+                for child in node:
+                    walk(child)
+            elif isinstance(node, dict):
+                if "textRun" in node:
+                    parts.append(str(node["textRun"].get("content", "")))
+                else:
+                    for key in (
+                        "body",
+                        "content",
+                        "paragraph",
+                        "elements",
+                        "table",
+                        "tableRows",
+                        "tableCells",
+                        "documentTab",
+                        "childTabs",
+                    ):
+                        if key in node:
+                            walk(node[key])
+                    if "paragraph" in node:
+                        parts.append("\n")
+
+        walk(document.get("tabs") or document)
         return "".join(parts).strip()
 
     def collect(self, selected_document_ids: list[str]) -> list[EvidenceItem]:
@@ -118,13 +142,18 @@ class GoogleDocsEvidenceClient:
             modified = datetime.fromisoformat(metadata["modifiedTime"].replace("Z", "+00:00"))
             evidence.append(
                 EvidenceItem(
-                    evidence_id=f"GDOC-{document_id[:12].upper()}",
+                    evidence_id=f"GDOC-{document_id}",
                     source=SourceType.GOOGLE_DOC,
                     title=metadata["name"],
                     content=content,
                     occurred_at=modified,
                     source_url=metadata.get("webViewLink"),
-                    metadata={"kind": "project_note", "document_id": document_id},
+                    metadata={
+                        "kind": "project_note",
+                        "document_id": document_id,
+                        "timestamp_kind": "document_modified",
+                        "ingestion": "live_google",
+                    },
                 )
             )
         return evidence

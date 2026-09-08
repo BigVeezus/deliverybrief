@@ -16,8 +16,9 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[dev]"
+      - run: pip install -c requirements-lock.txt -e ".[dev]"
       - run: ruff check .
       - run: mypy deliverybrief
-      - run: pytest
+      - run: pytest --junitxml=output/reliability-tests.xml
+      - run: python scripts/summarize_reliability.py
       - run: python scripts/check_secrets.py

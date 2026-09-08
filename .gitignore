@@ -12,3 +12,7 @@ deliverybrief.db
 .streamlit/secrets.toml
 output/qa/
 tmp/
+workflow-budget.db
+evaluation/budget.db
+output/*.db
+output/*.xml

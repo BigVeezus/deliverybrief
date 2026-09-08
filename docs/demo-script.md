@@ -1,28 +1,33 @@
-# DeliveryBrief Five Minute Demo Script
+# DeliveryBrief five minute demo
 
-## 0:00 to 0:40 Problem and baseline
+## Before recording
 
-Introduce the delivery manager and show one anonymized previous weekly report. State the measured collection-to-approval time and observed correction burden. Explain that GitHub shows system activity while project notes contain the context needed for client communication.
+Open the app, the latest client PDF, and the reliability results. Use only anonymized sources. Say “simulation” when using the free examples. Show a live GitHub/Google/Anthropic flow only after the private credentials and spending are authorized and verified. Do not read this script word for word.
 
-## 0:40 to 2:20 Live workflow
+## 0 minutes to 40 seconds
 
-Open the public application. Select the reporting week, collect the sources, and show the evidence counts. Open one GitHub item and one project note. Generate the report and point out the client email sections and internal actions.
+Explain the problem: a manager reconstructs weekly delivery from vague PRs and developer notes. Explain why client updates are the chosen output. Describe Weeks B/C/D as reconstructed examples and the 55-minute median as an estimate, not measured savings.
 
-## 2:20 to 3:10 Review and approval
+## 40 seconds to 2 minutes
 
-Open one factual item and its evidence ID. Edit one sentence based on manager judgment. Show a missing action field warning. Acknowledge the reviewed warning, approve, and display the four exports. State that nothing was sent externally.
+Load the normal example, inspect two pieces of evidence, generate the draft, and explain that a merged PR does not prove deployment. Point out stable citations. Explain that the public simulation costs nothing and live Anthropic generation is a separate mode.
 
-## 3:10 to 4:00 Failure handling
+## 2 minutes to 3 minutes
 
-Run the conflict or untrusted-note case. Show the exact finding and disabled approval control. Explain the root cause and why a larger model is not allowed to conceal missing or conflicting evidence.
+Inspect the client wording, acknowledge review, approve, and download the PDF or Word file. Show that internal actions are a separate export. Edit the approved summary and point out that downloads disappear until reapproval.
 
-## 4:00 to 4:35 Results
+## 3 minutes to 4 minutes
 
-Show the frozen evaluation table. Compare the previous workflow, direct-prompt baseline, Haiku, Sonnet, and final system. Report grounding, coverage, action accuracy, pass rate, time, latency, and cost without rounding away a missed target.
+Load the mobile/backend mismatch. Show both sources and the blocked state. Explain that the manager must confirm the situation, correct the draft, and record supporting evidence and a reason. Alternatively show the unsafe note and its blocked client wording. Do not pretend a checkbox proves semantic truth.
 
-## 4:35 to 5:00 Limitation and next step
+## 4 minutes to 4 minutes 35 seconds
 
-State the most important limitation from the real run. Explain the first two-week change and the metric that would determine whether the manager continues using the system.
+Show the executed 48-case breakdown and the overall automated test result. Explain one actual failure: a citation could be valid while its claim was false, so the evaluator now requires claim review. Keep software test results separate from model quality and user timing.
 
-Do not read this script word for word. Rehearse until each decision can be explained naturally while the matching evidence is on screen.
+## Final 25 seconds
 
+State what remains: human-reviewed model scores, observed task timing, and production-grade persistent storage/authentication. Explain the next step: one consenting manager completes a timed task without help, then their corrections become regression cases.
+
+## Interview preparation
+
+Be ready to explain why there is no vector database; why retries are bounded; why approval is version-specific; why the budget keeps uncertain reservations; and why the earlier proxy scores were corrected. Open the relevant function and explain one test in your own words.

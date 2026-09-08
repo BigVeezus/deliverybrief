@@ -1,99 +1,64 @@
 # DeliveryBrief Evaluation Package
 
-## Evaluation question
+## What this evaluation establishes
 
-I built DeliveryBrief to test whether a delivery manager can prepare a weekly client update faster without increasing factual or privacy risk. The evaluation separates report quality, workflow time, system reliability, and user correction. A sample output is useful for demonstrating the interface, but it is not field evidence.
+DeliveryBrief has an expanded set of 48 named workflow cases, plus regression and interface tests. The current software suite passes 82 automated tests. The 48 named cases pass as 36 development cases and 12 reserved cases. These are free software contract tests, including mocked APIs and deterministic output. They are not a live Anthropic quality benchmark or evidence of user adoption.
 
-## Baselines
+The executed results are in `evaluation/results/reliability-v2.json`. The complete test output is reproducible with `pytest --junitxml=output/reliability-tests.xml` followed by `python scripts/summarize_reliability.py`.
 
-The previous-workflow baseline uses three anonymized reconstructed weeks from real operating patterns. I recorded manual preparation estimates for each week: 55 minutes for the payment retry week, 75 minutes for the mobile/backend contract week, and 40 minutes for the reporting migration week. The median manual preparation estimate is 55 minutes.
+## Baselines and provenance
 
-The deterministic demo baseline runs the same Day 1 reconstructed weeks without Anthropic. It is intentionally simple and exists so the public demo can run without credentials or cost. It failed the three harder Day 1 examples because it did not reliably split multiple action owners from one developer note.
+Elvis supplied three anonymized reconstructed operating weeks: payment retries, mobile/backend coordination, and an ingest migration revert. Their manual preparation estimates are 55, 75, and 40 minutes, with a median of 55 minutes. No stopwatch measurement or independent interview is claimed.
 
-The direct-model baseline still needs to be run or documented. I did not run a full Sonnet benchmark because Elvis asked to cap cost after the first partial Sonnet attempt. Sonnet remains available only if a specific comparison is worth the extra spend.
+The earlier Haiku structured-workflow run returned 9 of 9 under a v1 proxy evaluator, costing an estimated $0.025316 with median generation latency of 6,444 ms. The direct-prompt baseline returned 1 of 9 under a different keyword evaluator and cost an estimated $0.007295. The original JSON files remain unchanged. Because the scorers differed, this is not a controlled model-quality comparison.
 
-## Measures and reasons
+The old measure named grounding checked citation IDs, coverage counted handled evidence IDs, and action accuracy counted expected owners. These proxies could reward an incorrect statement with a valid citation. The revision corrects the terminology and method. A new paid model comparison was not run; additional spending was not authorized.
 
-| Measure | Calculation | Reason |
-| --- | --- | --- |
-| Grounding | Valid cited factual items divided by all cited factual items | Unsupported client claims create direct trust risk |
-| Coverage | Expected facts represented divided by expected facts | A fluent report can still omit important work or risk |
-| Action accuracy | Supported owner, task, and date fields divided by expected action fields | Incorrect ownership creates operational rework |
-| Exception handling | Expected failure behaviors observed divided by expected behaviors | The system must explain failure beyond one successful example |
-| Safety | All secret, PII, and prompt-injection cases pass | A single sensitive leak is unacceptable for the pilot |
-| Human edit rate | Changed generated fields divided by generated fields | Measures the correction burden left to the manager |
-| Workflow time | Minutes from source selection through approval | Tests the claimed operational benefit |
-| Latency and cost | Recorded per execution | Supports a defensible model choice |
+## Measures and thresholds
 
-Quality weight is 35 percent grounding, 25 percent coverage, 20 percent action accuracy, and 20 percent exception handling. Safety is a separate hard gate.
+Citation validity is the share of cited IDs present in the supplied evidence. It is reported separately from factual grounding.
 
-## Release criteria
+Factual grounding is supported claims divided by reviewed claims. Every summary, report item, and action is presented for review against its evidence. A named reviewer and an exact report fingerprint are required. The release target is 95 percent because unsupported client claims create trust risk.
 
-- At least 9 of 10 total cases pass.
-- Every safety case passes.
-- Grounding reaches at least 95 percent.
-- Coverage reaches at least 90 percent.
-- Action accuracy reaches at least 85 percent.
-- Median user workflow time falls by at least 60 percent.
-- Blocking findings cannot be approved.
+Coverage is expected facts represented divided by all expected facts. A warning about an evidence record does not automatically count as factual coverage. The target is 90 percent because omitted delivery risks can mislead the client even in otherwise accurate prose.
 
-These thresholds are intentionally strict for grounding and safety because a wrong client claim matters more than a missing low-priority detail. The ten-case sample is too small to support a general production-reliability claim.
+Action accuracy uses one-to-one reviewed matches of task, owner, and due date. Its F1 score is twice the matched count divided by the number of output actions plus expected actions. Extra invented actions reduce the score. The target is 85 percent.
+
+Exception handling measures whether the expected workflow behavior occurred. Correct blocking and unnecessary blocking are recorded separately. Privacy, approval, session isolation, and budget checks are hard release gates.
+
+Weighted reviewed quality remains 35 percent grounding, 25 percent coverage, 20 percent action accuracy, and 20 percent exception behavior. Reports without completed factual review remain `awaiting_review`; their factual scores are null, not 100 percent.
+
+Time reduction is (manual task time minus app task time) divided by manual task time, reported across comparable paired tasks. Include collection, correction, review, and export. The median 60 percent target remains unmeasured.
 
 ## Test set
 
-| Case | Condition | Expected behavior |
+| Group | Cases | What the tests exercise |
 | --- | --- | --- |
-| 01 | Normal week | Report supported completion and client action |
-| 02 | No completed work | Do not invent completion |
-| 03 | Multiple repositories | Preserve evidence across both repositories |
-| 04 | Source conflict | Block approval and identify conflicting records |
-| 05 | Duplicate evidence | Avoid duplicate client bullets |
-| 06 | Missing action fields | Warn about owner and date without inventing them |
-| 07 | Empty document | Block or reject empty evidence |
-| 08 | Long notes | Preserve the supported weekly fact and action |
-| 09 | Transient API error | Retry three times and return a useful failure if exhausted |
-| 10 | Injection and PII | Treat instructions as source text and prevent sensitive output |
+| Normal reporting | 6 | Quiet weeks, accepted work, ongoing work, action fields |
+| Messy notes and PRs | 8 | Vague descriptions, typos, several owners, duplicates, Unicode |
+| Context and timelines | 8 | Reverts, undeployed merges, conflicts, dates, dependencies |
+| Privacy and hostile text | 8 | Fake secrets, personal data, instructions, private links, uncertainty |
+| API and input failures | 8 | Pagination, timeout, rate limit, denied access, invalid and oversized input |
+| Approval and exports | 10 | Direct bypass, edits, evidence changes, sessions, legacy records, documents, CSV, budgets |
 
-## Current executable evidence
+Each catalog case identifies synthetic provenance, its input, expected behavior, test reference, executed outcome, and failure explanation. The reconstructed B/C/D examples remain separately labeled in the app. Additional variants cover input order, duplicates, whitespace, and unrelated projects.
 
-The repository includes the ten-case manifest, deterministic validators, export tests, storage tests, a mocked GitHub retry contract, and Anthropic cost controls.
+The last two cases in each group were reserved before the first expanded execution. All 12 passed their first executed assertions. They share an authoring process with the implementation, so they are not an independent benchmark; subsequent executions are regression checks. Any case used for a later fix loses its unseen status.
 
-Cost control was added before the full paid run. `--estimate-only` gives a local upper-bound estimate with no Anthropic API call. `--max-estimated-cost-usd` stops the command before model calls if the estimate is above the approved cap.
+## Failures and learning
 
-## Results so far
+The earlier storage method approved reports without revalidation. Direct-call regression tests now reject invalid citations and legacy records lacking evidence snapshots. Editing a report or changing evidence after approval clears approval and refuses export. This check runs below the interface.
 
-| Run | Dataset | Model | Result | Cost |
-| --- | --- | --- | --- | --- |
-| Day 1 demo baseline | `evaluation/day1` | deterministic demo | 0 of 3 passed | $0 |
-| Day 1 Haiku | `evaluation/day1` | `claude-haiku-4-5` | 3 of 3 passed | $0.015467 |
-| Direct-prompt Haiku | `evaluation/cases` | `claude-haiku-4-5` | 1 of 9 scored report cases passed | $0.007295 |
-| Full Haiku estimate | `evaluation/cases` | `claude-haiku-4-5` | estimate only, no API call | upper bound $0.281882 |
-| Full Haiku final | `evaluation/cases` | `claude-haiku-4-5` | 9 of 9 scored report cases passed; case 09 covered by integration test | $0.025316 |
+The v1 citation proxy could award full credit to an unsupported statement. A new regression deliberately attaches a real citation to a fabricated budget-approval claim. Citation validity remains one, factual grounding remains pending, and a rejecting synthetic review makes the case fail. The synthetic reviewer is test data, not Elvis's review.
 
-Full Haiku result file: `evaluation/results/full-haiku.json`.
+During the revision, the phone detector damaged ISO timestamps. Date protection was corrected and tested for both date-only strings and full timestamps. A separate quiet-week case found that “No completed work” triggered completion; the demo matcher was corrected and negation cases retained.
 
-The final full Haiku run recorded 100 percent grounding, 100 percent coverage, 100 percent action accuracy, 100 percent exception handling, and safety pass across all scored report cases. Median latency was 6,444 ms.
+Earlier Anthropic schema rejection and the missing cross-repository/action findings remain in the historical evidence. Full explanations of the new failures, root causes, changes, and remaining limits are in `docs/reliability-upgrade.md`.
 
-The direct-prompt baseline used the same Haiku model without DeliveryBrief's evidence IDs, structured-output schema, deterministic validation, approval gate, or export/run record. It produced readable prose in several cases, but only 1 of 9 scored cases passed the automated audit. The main lesson is not that the model cannot summarize; it is that a direct prompt is hard to verify reliably.
+## Costs and remaining evidence
 
-## Required failure analysis
+No new paid Anthropic calls were made for this revision. Public scenarios are free simulations. The workflow requires an explicit positive budget and reserves a conservative maximum before each request. Unknown pricing blocks execution; failed requests with uncertain billing keep their reservation. The maximum is three attempts and hidden SDK retries are disabled.
 
-Three useful failures have already been recorded:
+Application reservations do not cap unrelated account spending. Hosted SQLite files may disappear on redeployment; durable storage is required before a sustained paid pilot. Estimates are not provider billing guarantees.
 
-| Failure | Root cause | Change made | Regression result |
-| --- | --- | --- | --- |
-| Anthropic rejected the structured-output schema | Pydantic schema did not explicitly set `additionalProperties: false` for every object | Added strict schema conversion before Anthropic calls and test coverage | Anthropic Haiku ran successfully after the fix |
-| Case 03 missed one cross-repository evidence item | The prompt allowed important evidence to appear only in the executive summary, which did not count as substantive coverage | Prompt now requires important evidence in a report section or action item; evaluator reports missing evidence IDs | Focused case 03 passed |
-| Case 06 allowed action-like evidence to disappear | The model could avoid creating an action when owner/date were missing, so the validator had nothing to warn about | Validator now flags action-like evidence with missing owner/date when it is not tied to an action or next priority | Focused case 06 passed; final full Haiku run passed |
-
-## Limits
-
-The first evaluation covers one project shape and ten cases. Pattern-based privacy checks can produce false positives. A read-only integration reduces source risk but does not prove the client wording is correct. The manager remains the final approver.
-
-Remaining evidence needed before final PDF submission: target-user run/edit observations if time allows, live GitHub/Google credential check if used, final screenshots, and final document review.
-
-## App-run evidence
-
-The public Streamlit app was run with bundled sample evidence on 7 September 2026. The approved run produced four exports: client email, action CSV, report JSON, and run summary. The run summary recorded `status: approved`, `evidence_count: 5`, `edits_made: true`, `generator: deterministic-demo-v1`, and `latency_ms: 1`.
-
-This app-run evidence verifies the demo workflow and export controls. It is not counted as the measured time-reduction result because it used sample evidence rather than a live manager's weekly source material.
+Release evidence still required: a new human-reviewed model run if spending is authorized, a consenting user's complete timed task, Elvis's final claim/code review, and the demo video. Live-source credentials must be checked in the private deployment before presenting a live GitHub/Google flow. Software test passes do not replace these tasks.

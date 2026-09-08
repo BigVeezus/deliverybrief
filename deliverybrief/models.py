@@ -10,6 +10,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class SourceType(StrEnum):
     GITHUB = "github"
     GOOGLE_DOC = "google_doc"
+    UPLOAD = "upload"
+    NOTE = "note"
 
 
 class FindingSeverity(StrEnum):
@@ -106,6 +108,7 @@ class GenerationResult(BaseModel):
     latency_ms: int
     usage: UsageRecord = Field(default_factory=UsageRecord)
     generator: Literal["anthropic", "demo"]
+    attempts: int = 1
 
 
 class RunRecord(BaseModel):
@@ -122,6 +125,13 @@ class RunRecord(BaseModel):
     status: ApprovalStatus
     approved_at: datetime | None = None
     edits_made: bool = False
+    schema_version: int = 2
+    evidence_fingerprint: str | None = None
+    report_fingerprint: str | None = None
+    prompt_version: str = "client-report-v2"
+    attempts: int = 1
+    warning_acknowledgements: list[str] = Field(default_factory=list)
+    client_reviewed: bool = False
 
 
 class EvaluationResult(BaseModel):

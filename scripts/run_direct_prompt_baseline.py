@@ -10,9 +10,11 @@ from typing import Any
 
 from anthropic import Anthropic
 
+from deliverybrief.budget import BudgetLedger
 from deliverybrief.config import load_settings
 from deliverybrief.evaluation import EvaluationCase, load_cases
 from deliverybrief.generator import _estimate_cost
+from deliverybrief.privacy import safe_evidence
 
 MAX_OUTPUT_TOKENS = 1200
 
@@ -26,10 +28,10 @@ def direct_prompt(case: EvaluationCase) -> str:
             "occurred_at": item.occurred_at.isoformat(),
             "metadata": item.metadata,
         }
-        for item in case.evidence
+        for item in safe_evidence(case.evidence)
     ]
     return (
-        "Write a concise weekly delivery update for an MD from these raw GitHub and "
+        "Write a concise weekly delivery update for a client from these raw GitHub and "
         "developer-note inputs. Include completed work, in-progress work, blockers, "
         "and action items if they are present. Do not reveal private personal data or "
         "secrets. This is a direct-prompt baseline, so do not use JSON.\n\n"
@@ -105,10 +107,7 @@ def score_output(case: EvaluationCase, output: str) -> dict[str, Any]:
         0.35 * coverage + 0.25 * coverage + 0.20 * action_accuracy + 0.20 * exception_handling
     )
     passed = (
-        coverage >= 0.90
-        and action_accuracy >= 0.85
-        and exception_handling >= 1.0
-        and safety_pass
+        coverage >= 0.90 and action_accuracy >= 0.85 and exception_handling >= 1.0 and safety_pass
     )
     return {
         "case_id": case.case_id,
@@ -126,6 +125,8 @@ def score_output(case: EvaluationCase, output: str) -> dict[str, Any]:
 
 
 def run_baseline(dataset: Path, output: Path, max_estimated_cost_usd: float | None) -> None:
+    if max_estimated_cost_usd is None:
+        raise SystemExit("An explicit budget is required; no API calls were made.")
     settings = load_settings()
     if not settings.anthropic_api_key:
         raise SystemExit("ANTHROPIC_API_KEY is required")
@@ -144,7 +145,10 @@ def run_baseline(dataset: Path, output: Path, max_estimated_cost_usd: float | No
             f"${max_estimated_cost_usd:.6f}."
         )
 
-    client = Anthropic(api_key=settings.anthropic_api_key)
+    if estimated_cost is None:
+        raise SystemExit("Unknown model pricing; no API calls were made.")
+    budget = BudgetLedger(Path("evaluation/budget.db"), max_estimated_cost_usd)
+    client = Anthropic(api_key=settings.anthropic_api_key, max_retries=0, timeout=30)
     results: list[dict[str, Any]] = []
     total_cost = 0.0
     for case in cases:
@@ -160,6 +164,7 @@ def run_baseline(dataset: Path, output: Path, max_estimated_cost_usd: float | No
             continue
         prompt = direct_prompt(case)
         started = time.perf_counter()
+        budget.reserve(_estimate_cost(model, len(prompt.encode()) + 1024, MAX_OUTPUT_TOKENS))
         response = client.messages.create(
             model=model,
             max_tokens=MAX_OUTPUT_TOKENS,

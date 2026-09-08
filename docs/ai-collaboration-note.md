@@ -185,3 +185,19 @@ This log records how I used AI during the Quest and how I checked its work. I re
 ## Daily continuation format
 
 For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.
+
+### 8 September 2026 Reliability revision
+
+Tool and model: Codex coding agent in this task; no new Anthropic API requests. Elvis requested messy samples, tests, documented decisions, client documents, and cost controls.
+
+Delegated: shared approval checks, evidence snapshots, session separation, input validation, connector pagination, 48 named cases, extra boundary/UI tests, document exports, and documentation updates.
+
+Accepted in the implementation: the Python/Streamlit architecture, conservative paid-request reservations, five free scenarios, and human-controlled approval.
+
+Corrected through inspection and tests: citation validity was mislabeled as grounding; storage approval bypassed UI validation; the phone detector damaged timestamps; “No completed work” triggered completion. These failures are recorded in the reliability log.
+
+Verification: executed pytest output feeds `evaluation/results/reliability-v2.json`. Static checks, browser verification, and rendered-document inspection support the handoff. Automated checks are not user feedback or a live Anthropic benchmark.
+
+Elvis's decisions: client updates stay primary, the public demo stays free, and additional paid model calls require approval. Elvis's final code walkthrough, factual review, and consenting-user observation are still pending. This entry does not claim they happened.
+
+Artifacts: `docs/reliability-upgrade.md`, the expanded tests, and the revised application.

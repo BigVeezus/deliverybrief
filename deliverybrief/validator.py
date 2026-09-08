@@ -20,7 +20,7 @@ SECRET_PATTERNS = {
 }
 EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
 PHONE_RE = re.compile(r"(?<!\d)(?:\+?\d[\d ()-]{8,}\d)(?!\d)")
-ISO_DATE_RE = re.compile(r"\b20\d{2}-\d{2}-\d{2}\b")
+ISO_DATE_RE = re.compile(r"(?<!\d)20\d{2}-\d{2}-\d{2}(?!\d)")
 PROMPT_INJECTION_RE = re.compile(
     r"\b(ignore (?:all|any|the) (?:previous|prior) instructions|system prompt|developer message|"
     r"reveal (?:the )?(?:secret|credential|prompt))\b",
@@ -65,7 +65,42 @@ def validate_report(
                 )
             )
 
+    # Check all strings, including project labels and source limitations used by exports.
+    if any(
+        not text.strip()
+        for text in [report.executive_summary] + [item.text for _, _, item in report_items(report)]
+    ):
+        findings.append(
+            ValidationFinding(
+                severity=FindingSeverity.BLOCK,
+                code="EMPTY_CLAIM",
+                message="Remove or complete empty report statements.",
+            )
+        )
+
     report_text = _report_text(report)
+    private_urls = [item.source_url for item in evidence if item.source_url]
+    if any(url in report_text for url in private_urls):
+        findings.append(
+            ValidationFinding(
+                severity=FindingSeverity.BLOCK,
+                code="PRIVATE_SOURCE_LINK",
+                message="Remove source links from client text; inspect them internally instead.",
+            )
+        )
+    sensitive = re.compile(
+        r"\b(confidential|internal only|client must not see|password|blame|billing rate|"
+        r"security vulnerability|exploit details)\b",
+        re.IGNORECASE,
+    )
+    if sensitive.search(report_text):
+        findings.append(
+            ValidationFinding(
+                severity=FindingSeverity.BLOCK,
+                code="CLIENT_SENSITIVE_CONTENT",
+                message="Review and remove internal or sensitive wording from the client draft.",
+            )
+        )
     for name, pattern in SECRET_PATTERNS.items():
         if pattern.search(report_text):
             findings.append(
@@ -142,6 +177,42 @@ def validate_report(
                 ]
             )
     for item in evidence:
+        if not report.period.start <= item.occurred_at.date() <= report.period.end:
+            findings.append(
+                ValidationFinding(
+                    severity=FindingSeverity.WARNING,
+                    code="OUTSIDE_PERIOD",
+                    message="Evidence timestamp is outside this reporting week. Confirm relevance.",
+                    evidence_ids=[item.evidence_id],
+                )
+            )
+        if item.metadata.get("timestamp_kind") == "document_modified":
+            findings.append(
+                ValidationFinding(
+                    severity=FindingSeverity.WARNING,
+                    code="DOCUMENT_DATE",
+                    message="This is a note modification date, not a verified event date.",
+                    evidence_ids=[item.evidence_id],
+                )
+            )
+        if item.metadata.get("external_dependency"):
+            findings.append(
+                ValidationFinding(
+                    severity=FindingSeverity.WARNING,
+                    code="EXTERNAL_DEPENDENCY",
+                    message="Another repository is mentioned. Its state was not verified.",
+                    evidence_ids=[item.evidence_id],
+                )
+            )
+        if item.metadata.get("redacted"):
+            findings.append(
+                ValidationFinding(
+                    severity=FindingSeverity.WARNING,
+                    code="SOURCE_REDACTED",
+                    message="Sensitive values were masked before generation. Review the context.",
+                    evidence_ids=[item.evidence_id],
+                )
+            )
         if item.evidence_id in action_citations or item.evidence_id in priority_citations:
             continue
         if ACTION_SIGNAL_RE.search(f"{item.title} {item.content}"):
@@ -211,8 +282,10 @@ def validate_report(
             topics.setdefault(topic, []).append(item)
     for topic, items in topics.items():
         combined = " ".join(f"{item.title} {item.content}" for item in items).casefold()
-        completed_signal = any(word in combined for word in ("merged", "completed", "accepted"))
-        blocked_signal = any(word in combined for word in ("blocked", "not complete", "reopened"))
+        completed_signal = bool(re.search(r"(?<!not )\b(merged|completed|accepted)\b", combined))
+        blocked_signal = bool(
+            re.search(r"(?<!not )\b(blocked|not complete|reopened|reverted)\b", combined)
+        )
         if completed_signal and blocked_signal:
             findings.append(
                 ValidationFinding(
@@ -245,7 +318,12 @@ def approval_status(findings: list[ValidationFinding], approved: bool = False) -
 
 
 def _report_text(report: WeeklyReport) -> str:
-    parts = [report.executive_summary]
+    parts = [
+        report.project_name,
+        report.client_label,
+        report.executive_summary,
+        *report.source_limitations,
+    ]
     parts.extend(item.text for _, _, item in report_items(report))
     for action in report.action_items:
         parts.extend([action.task, action.owner or "", str(action.due_date or "")])

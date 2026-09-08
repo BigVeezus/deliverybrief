@@ -3,6 +3,11 @@ from __future__ import annotations
 import csv
 import io
 import json
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from deliverybrief.models import EvidenceItem
+    from deliverybrief.storage import RunStore
 from email.message import EmailMessage
 
 from deliverybrief.models import WeeklyReport
@@ -52,11 +57,11 @@ def action_csv(report: WeeklyReport) -> str:
     for item in report.action_items:
         writer.writerow(
             {
-                "task": item.task,
-                "owner": item.owner or "",
+                "task": spreadsheet_safe(item.task),
+                "owner": spreadsheet_safe(item.owner or ""),
                 "due_date": item.due_date.isoformat() if item.due_date else "",
                 "review_status": item.review_status,
-                "evidence_ids": "|".join(item.evidence_ids),
+                "evidence_ids": spreadsheet_safe("|".join(item.evidence_ids)),
             }
         )
     return output.getvalue()
@@ -64,3 +69,29 @@ def action_csv(report: WeeklyReport) -> str:
 
 def report_json(report: WeeklyReport) -> str:
     return json.dumps(report.model_dump(mode="json"), indent=2, sort_keys=True)
+
+
+def spreadsheet_safe(value: str) -> str:
+    return "'" + value if value.lstrip().startswith(("=", "+", "-", "@", "\t", "\r")) else value
+
+
+def approved_exports(
+    store: RunStore,
+    run_id: str,
+    report: WeeklyReport,
+    evidence: list[EvidenceItem],
+) -> dict[str, bytes]:
+    """Only public export entrypoint. Serialization helpers do not confer approval."""
+    from deliverybrief.report_documents import client_docx, client_pdf
+
+    snapshot = store.approved_snapshot(run_id, report, evidence)
+    record = store.get(run_id)
+    assert record is not None
+    return {
+        "Client email.eml": email_bytes(snapshot),
+        "Client report.pdf": client_pdf(snapshot),
+        "Client report.docx": client_docx(snapshot),
+        "Internal actions.csv": action_csv(snapshot).encode(),
+        "Report.json": report_json(snapshot).encode(),
+        "Run summary.json": record[0].model_dump_json(indent=2).encode(),
+    }

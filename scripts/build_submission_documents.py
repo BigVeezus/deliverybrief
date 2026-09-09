@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Any
 
 from docx import Document
 from docx.enum.table import WD_ALIGN_VERTICAL
@@ -23,9 +24,30 @@ SOURCES = {
 }
 
 
+def table_widths(source: str, cells: list[str]) -> list[float]:
+    column_count = len(cells)
+    if source == "evaluation-package.md":
+        header = [cell.lower() for cell in cells]
+        if header == ["week", "problem pattern", "manual estimate"]:
+            return [2.2, 3.45, 1.15]
+        if header == ["check", "result"]:
+            return [3.5, 3.3]
+        if header == ["metric", "what it checks", "why it matters"]:
+            return [1.8, 2.35, 2.65]
+        if header == ["group", "cases", "examples"]:
+            return [2.05, 0.8, 3.95]
+    return [6.8 / column_count] * column_count
+
+
 def plain(text: str) -> str:
     text = re.sub(r"\[([^]]+)\]\(([^)]+)\)", r"\1 (\2)", text)
     return text.replace("**", "").replace("`", "")
+
+
+def shade_cell(cell: Any, fill: str) -> None:
+    shade = OxmlElement("w:shd")
+    shade.set(qn("w:fill"), fill)
+    cell._tc.get_or_add_tcPr().append(shade)
 
 
 def build(source: str, name: str) -> Path:
@@ -64,7 +86,7 @@ def build(source: str, name: str) -> Path:
                 table = document.add_table(rows=0, cols=len(cells))
                 table.style = "Table Grid"
                 table.autofit = False
-                widths = [2.1, 0.65, 4.05] if source == "evaluation-package.md" else [1, 3.8, 2]
+                widths = table_widths(source, cells)
                 for col, width in zip(table.columns, widths, strict=True):
                     col.width = Inches(width)
             row = table.add_row()
@@ -90,32 +112,29 @@ def build(source: str, name: str) -> Path:
                 cell.text = value
                 for paragraph in cell.paragraphs:
                     paragraph.paragraph_format.space_after = Pt(5)
-                    if source == "evaluation-package.md" and index == 1:
+                    header_text = table.rows[0].cells[index].text.lower() if len(table.rows) else ""
+                    if header_text in {"cases", "result", "manual estimate"}:
                         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     for run in paragraph.runs:
                         run.font.size = Pt(9.5)
+                if (
+                    len(table.rows) > 1
+                    and source == "evaluation-package.md"
+                    and table.rows[0].cells[0].text.lower() == "check"
+                    and index == 1
+                ):
+                    shade_cell(cell, "FFF2CC" if "$" in value else "D9EAD3")
             if len(table.rows) == 1:
                 properties = row._tr.get_or_add_trPr()
                 properties.append(OxmlElement("w:tblHeader"))
-                for cell in row.cells:
-                    shade = OxmlElement("w:shd")
-                    shade.set(qn("w:fill"), "E8EEF2")
-                    cell._tc.get_or_add_tcPr().append(shade)
-                    for run in cell.paragraphs[0].runs:
+                for header_cell in row.cells:
+                    shade_cell(header_cell, "E8EEF2")
+                    for run in header_cell.paragraphs[0].runs:
                         run.bold = True
         elif line.startswith("- "):
             document.add_paragraph(plain(line[2:]), "List Bullet")
         else:
             document.add_paragraph(plain(line))
-    if source == "case-study.md":
-        screenshot = ROOT / "evidence/reliability/browser-approved.png"
-        if screenshot.exists():
-            document.add_heading("Verified local workflow", level=1)
-            document.add_picture(str(screenshot), width=Inches(4.8))
-            document.add_paragraph(
-                "Local browser check of the revised free simulation. "
-                "This is software verification, not a participant observation."
-            )
     output = ROOT / "output/docx" / f"{name}.docx"
     output.parent.mkdir(parents=True, exist_ok=True)
     document.save(str(output))

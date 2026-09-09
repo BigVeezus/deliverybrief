@@ -1,113 +1,160 @@
 # DeliveryBrief Case Study
 
-## What I built
+## 1. What I built
 
-I built DeliveryBrief to help a project or delivery manager prepare a weekly client update from GitHub activity and project notes. The system collects evidence, generates a structured draft, checks known failure conditions, and leaves the final external message under the manager's control.
+I built DeliveryBrief, a small workflow system that helps a project/product manager prepare a weekly delivery update from GitHub activity and developer notes.
 
-I chose the name because it describes the job. Delivery identifies the work being reported. Brief describes the short output. I did not include AI in the name because the manager's goal is a dependable update, not an AI interaction.
+The user starts with scattered evidence: pull requests, commits, issues, rough dev notes, missing context, and sometimes conflicting messages. DeliveryBrief helps turn that into a reviewed client-ready update with supporting evidence, action items, and exportable documents.
 
-## Why I chose this workflow
+The product name is intentionally plain. “Delivery” is the work being reported. “Brief” is the concise update the manager needs to send. I left “AI” out of the name because the user is buying a dependable reporting workflow instead of another chatbot surface.
 
-Weekly delivery reporting is recurring and bounded. It also exposes a real mismatch between tools. GitHub records pull requests, issues, and commits, while project notes contain decisions, risks, and client context. A manager must reconcile both before writing a message that another person will trust.
+## 2. The real workflow problem
 
-On Day 1, I recorded a project/product manager perspective for a manager handling several projects and sending weekly updates to an MD. The recurring problem is that GitHub shows activity, but not always the delivery story. PRs may have vague names, missing descriptions, no issue links, or no connection to developer notes.
+The target user is a project/product manager responsible for weekly updates to an MD or client-facing stakeholder.
 
-I also checked the problem against public research. PMI's communications report ties unclear project communication to project risk. DORA's value-stream guidance tells teams to inspect information flow, wait time, and handoffs. DORA's loosely coupled teams guidance treats cross-team coordination as delivery friction. That matched the pattern in my examples: the git history alone did not explain the state of the work.
+In that role, the manager usually has to answer questions like:
 
-## Previous process
+- What actually moved this week?
+- What looks complete in GitHub but still needs review or deployment?
+- What is blocked?
+- Who owns the next step?
+- What should be said to the client?
+- What must stay internal?
 
-The previous process is manual: open GitHub PRs and issues, read developer notes, reconstruct what actually happened, decide what the MD needs to know, then write a clean update with blockers and action items.
+The awkward part is that the answer rarely lives in one clean place. GitHub gives activity, but developer notes often explain the real state of the work.
 
-I collected three anonymized reconstructed weeks from real operating patterns:
+For example, a PR can be merged while the work is still unreleased. A developer can mention a blocker in a note without linking it to an issue. A revert can protect production while looking like failure if the business reason is missing. These are the details a PM has to catch before writing an update.
 
-| Week | Scenario | Manual time estimate |
-| --- | --- | ---: |
-| Week B | Payment retry/idempotency risk | 55 minutes |
-| Week C | Mobile/backend contract coordination | 75 minutes |
-| Week D | Reporting migration/revert context | 40 minutes |
+## 3. Why I chose this project
 
-Median manual preparation estimate: 55 minutes.
+I chose weekly delivery updates because it is a repeatable operations problem with visible inputs, visible outputs, and real business risk.
 
-## Scope
+I have also felt this problem myself as a lead engineer in the past. When delivery information is split across PRs, notes, calls, and people’s memory, the weekly update can become harder than it should be. I have wanted to solve that gap for a while.
 
-The first version supports one project, one GitHub repository, and one Google Drive folder. It produces client PDF, Word, and email files plus a separate internal action CSV but never sends a message. It does not provide multi-project administration, historical search, delivery forecasting, or organization-wide authentication.
+It also fits the Applied AI Engineer role. The task needs API integrations, file handling, structured generation, validation, approval, exports, and workflow logging. It is small enough to finish in five days, but serious enough to show how I think about reliability.
 
-I kept the scope small so the five-day build includes evaluation, failure handling, documentation, and a real user run.
+That gave me the product direction: build a system that helps a manager move from messy source material to a decision-ready update.
 
-## Design
+## 4. The old process
 
-GitHub and Google Drive or Docs adapters convert source records into a shared `EvidenceItem` schema with stable IDs. Claude receives only these normalized records and must attach evidence IDs to every factual report item. Pydantic checks the response structure. Deterministic validation then checks citations, sensitive patterns, missing action fields, empty evidence, instruction-like source text, and explicit conflicts.
+Before DeliveryBrief, the manager’s process was manual.
 
-The Drive adapter now reads native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes from the configured folder. Unsupported files receive a clear message instead of being treated as evidence.
+They would open GitHub, scan PRs and issues, read notes from developers, reconstruct the timeline, decide what mattered to the MD or client, remove sensitive details, write the update, create action items, and review everything again.
 
-The Streamlit interface exposes the evidence before generation. After generation, the manager can inspect citations and edit each section. Blocking findings disable approval. Warnings require acknowledgement. Approved reports can be downloaded as client PDF/DOCX files, email, CSV, report JSON, run summary, and workflow trace.
+The slowest part was not typing the final update. The slowest part was understanding the truth behind the week.
 
-After the reliability work, I refactored the code into named runtime layers: Streamlit UI, workflow service, generation adapters, approval rules, SQLite persistence, and export serializers. I kept compatibility wrappers for the older module names so the deadline work stayed stable while the structure became easier to inspect and extend.
+I used three anonymized weekly examples to shape the product:
 
-I also added a lightweight tool selector and workflow trace instead of adding LangGraph, CrewAI, or n8n at the end. My reason was practical: the job signal I wanted to show is not the framework name, it is the workflow behavior. The system now records which tools were selected or skipped, why each step ran, how many records came out, attempts, latency, redacted errors, approval status, and export status.
+- Payment retry work where GitHub showed fixes, but notes still warned about old queued jobs.
+- Mobile work blocked by a backend contract change that was not clearly documented.
+- A reporting migration where a reverted PR looked negative until the notes explained why it protected the nightly production window.
 
-## Why I made these choices
+The median manual estimate across those examples was 55 minutes.
 
-I used Python and Streamlit because the five-day constraint favored a small, testable application over a custom frontend. I used my funded Anthropic account rather than adding a new billing dependency. Haiku remains the provisional low-cost candidate; the earlier proxy evaluation does not establish a semantic quality advantage. Sonnet remains a possible benchmark, but I stopped further Sonnet runs after deciding to cap spend.
+## 5. The new workflow
 
-I did not add a vector database. The user selects one bounded week of evidence, so indexing a historical corpus would introduce another failure surface without serving the first workflow. I also kept both integrations read-only and stopped at file exports because external communication requires human accountability.
+DeliveryBrief changes the workflow into six guided steps:
 
-## Failures and changes
+1. Select the reporting week.
+2. Fetch work from the configured GitHub repository.
+3. Select one or more developer notes from the configured Drive folder, or paste an extra note.
+4. Generate a structured weekly brief.
+5. Review the evidence, warnings, and action items.
+6. Approve and download the final outputs.
 
-The build improved because the first evaluated runs failed in useful ways.
+The app exports a client PDF, client DOCX, client email draft, internal action CSV, structured JSON, run summary, and workflow trace.
 
-First, Anthropic rejected the structured-output schema because the Pydantic schema did not explicitly set `additionalProperties: false` for every object. I fixed the schema conversion and added a test.
+The email is drafted only. DeliveryBrief never sends it automatically because the final external message should stay under the manager’s control.
 
-Second, the first full Haiku run missed one cross-repository evidence item in case 03. I changed the prompt so important evidence cannot appear only in the executive summary, and I added missing-evidence reporting to the evaluator.
+## 6. Product decisions I made
 
-Third, case 06 showed that action-like evidence could disappear when the model did not create an action item. I changed the validator so evidence that clearly asks for follow-up is flagged when no owner or due date is present in the draft.
+I kept the first version focused on one project, one GitHub repository, and one Google Drive folder. That made the product safer, easier to test, and easier to demo under the Quest deadline.
 
-Fourth, the first private live smoke found that an uploaded developer note was a plain text file, not a native Google Doc. I changed the adapter to support common note files from Drive and added a regression for `.docx` text and table extraction.
+I used GitHub and developer notes together because they answer different questions. GitHub shows activity. Notes explain intent, blockers, deployment status, and client context.
 
-Fifth, an external review question made me realize the workflow should visibly show orchestration, not only the final report. I added tool selection and trace logging around collection, generation, validation, approval, and export. I kept the orchestration in plain Python so the code remains small enough to explain and maintain before the deadline.
+I made evidence visible before generation because the manager should know what the system is using. If the wrong note is selected, the workflow should stop early enough for the manager to correct it.
 
-Focused regressions for case 03 and case 06 passed after the fixes. The trace upgrade added tests for selected/skipped tools, trace storage, redaction, approval invalidation, workflow-trace export, and the estimate-only live-smoke path.
+I kept approval human-controlled because client updates carry judgment. A system can check citations, missing owners, secret-looking values, and conflicts. A person still has to decide whether the message is appropriate for the client.
 
-## Results
+I added a tool selector and workflow trace because the role is about building repeatable systems, not one-off prompting. The trace shows which tools ran, which ones were skipped, what each step produced, how long it took, and whether approval or export was allowed.
 
-The earlier Haiku run passed 9 of 9 report cases under the v1 proxy evaluator. That is not a factual-quality measurement. The tenth case is an integration contract for transient GitHub failures and is covered by `tests/test_integrations.py::test_github_retries_transient_failure`.
+## 7. How the system is built
 
-The full Haiku run recorded:
+The application is organized into clear layers:
 
-- citation validity proxy: 100 percent
-- evidence-handling coverage proxy: 100 percent
-- expected-owner recall proxy: 100 percent
-- expected-finding recall proxy: 100 percent
-- safety: passed on all scored report cases
-- estimated model cost: $0.025316
-- median latency: 6,444 ms
+- Source adapters collect from GitHub and Google Drive.
+- Intake code normalizes notes, pasted text, and file content into evidence records.
+- The generation layer asks Claude for a structured report in live mode.
+- Validators check evidence references, privacy patterns, missing action fields, conflicts, and unsafe states.
+- The approval service ties approval to the exact report and evidence snapshot.
+- Export code creates the client and internal deliverables from the approved snapshot.
+- Persistence stores run records, evidence snapshots, findings, approvals, and workflow traces.
 
-I also ran a direct-prompt Haiku baseline without DeliveryBrief's evidence IDs, schema enforcement, validation, approval gate, or export record. It returned 1 of 9 under a different keyword audit and cost $0.007295. Because the two audits differ, these pass rates are not a controlled quality comparison. Several outputs were readable, but they were harder to verify because the final text did not preserve stable evidence handling.
+This structure matters because each part can be tested or replaced without rewriting the whole app. For example, adding Slack later should mean adding another source adapter, not changing the approval system.
 
-On 8 September, I ran a private live-source smoke test. It collected 26 GitHub records and one Google Drive text note, sent the normalized evidence to Claude Haiku once under a `$0.08` cap, and produced a valid structured report. The conservative request estimate was `$0.049441`; actual estimated cost was `$0.018218`; latency was 22,109 ms. The validator returned warnings for document date, missing action owner/date, and redacted source content. There were no blocking findings, so the approval service approved the report after warnings were acknowledged and produced the client PDF, Word document, email, action CSV, report JSON, and run summary. The later trace upgrade added workflow-trace export for new approved runs without making another paid Claude call.
+## 8. What changed after testing
 
-The first export attempt failed because it used the pre-sanitized evidence list after approval. The export service rejected the mismatch. I fixed the smoke harness to export from the stored evidence snapshot. That failure is useful because it proves approval is tied to an exact report and evidence version.
+Testing changed the product in practical ways.
 
-The time-reduction result is not final yet because I still need an observed user run through the interface and an edit-rate measurement.
+One live test showed that developer notes may be uploaded as plain text instead of native Google Docs. I updated the Drive adapter so common note formats like `.txt`, `.md`, `.csv`, and `.docx` can be read from the configured folder.
 
-## User response
+Another test showed that approval needed to be stricter. I changed approval so it belongs to the exact report and evidence snapshot. If the manager edits the report or changes the evidence, the app requires review again before downloads are available.
 
-I completed a public Streamlit app run using the bundled sample evidence. The run generated a report, I reviewed and approved it, and the app exported a client email, action CSV, report JSON, and run summary. The run summary records `status: approved`, `evidence_count: 5`, `edits_made: true`, and `generator: deterministic-demo-v1`.
+I also tightened how the system treats evidence. A real evidence ID proves that the source exists, but the manager still has to confirm that the claim is actually supported. That keeps the workflow honest.
 
-The captured app-run artifacts are stored in `evidence/day-2/app-run/`. The screenshot shows the generated client-email preview with evidence IDs attached to the report bullets. This supports the Working System demo, but I do not treat it as proof of real-world time savings because it used sample evidence.
+Finally, I added regression tests for wording like “not deployed,” “not confirmed,” and “no completed work.” Those small words change the business meaning of a weekly update.
 
-The remaining user-response evidence needed is a short observed run or review from another target user, if time allows.
+## 9. What works now
 
-## Limits and next two weeks
+The current system works end to end.
 
-The first version does not establish reliability across organizations. The next iteration would add scheduled collection, controlled Gmail draft creation, per-user OAuth, three additional delivery managers, and at least thirty real cases. Adoption tracking would focus on completed weekly runs, time to approval, edit rate, warning frequency, and abandoned runs.
+I can open the public Streamlit app, load a safe example, generate a weekly brief, inspect the evidence, approve the report, and export the final files.
 
-## Reliability revision
+I also verified the private live path locally with GitHub, Google Drive, Google Docs access, and Claude Haiku under a budget cap. That live run collected GitHub records and a Drive note, produced a valid structured report, passed validation without blocking findings, and exported from the approved snapshot.
 
-The revision adds 48 named workflow cases, approval checks below the interface, evidence snapshots, session isolation, bounded retries, conservative budget reservations, and PDF/Word exports. Actual automated results are in `evaluation/results/reliability-v2.json`. Model factual quality remains pending a claim-by-claim review.
+The automated test suite covers normal weeks, messy notes, privacy risks, API failures, approval bypass attempts, unsafe CSV values, session isolation, and workflow traces.
 
-Tests caught a phone detector that damaged ISO timestamps and a demo matcher that interpreted “No completed work” as completed work. Both now have regression coverage. The new evaluator deliberately leaves semantic scores pending rather than converting valid citations into claims of factual accuracy. A final structure test also checks that the refactored package boundaries exist and that helper scripts are import-safe. The detailed failure log is in `docs/reliability-upgrade.md`.
+The result is a working product that a non-developer can use and an engineer can inspect.
 
-Client updates are the selected primary output. The MD-reporting perspective remains useful problem context, but a real external participant has not yet validated this narrower client workflow. The observed user session and the 60 percent time-saving target remain pending.
+## 10. What I would show in the demo
 
-The final local verification after the trace upgrade passed 97 tests, Ruff, strict mypy, and the secret scan. I use GitHub Actions as the remote verification check; the trace-upgraded `main` branch passed CI in run `34221962129`.
+In the demo, I would show the product as a manager’s workflow rather than a technical dashboard.
+
+I would start with the reporting week, then fetch GitHub work, add developer notes, generate the draft, inspect the evidence, and approve the final report.
+
+Then I would show one messy case: a note says something is not deployed or not confirmed. The important moment is that DeliveryBrief keeps that uncertainty visible instead of turning it into a confident client promise.
+
+I would also briefly open the workflow trace. That part is for the engineering reviewer. It shows that the app is selecting tools, recording state, and enforcing gates behind the interface.
+
+## 11. What I intentionally left out
+
+I kept multi-repo selection out of the first version. It should come next, but only with a strict allowlist so the app stays inside the right project boundary.
+
+I also left Jira out of V1. Jira tickets can add useful planning context, but GitHub is already a strong engineering source because it contains PRs, commits, reviews, merge history, issues, and reverts. For this first version, GitHub plus developer notes was the cleanest way to prove the workflow without adding another permission system and another mapping problem.
+
+I kept automatic email sending out of scope. The current version exports an email draft because sending a client message should remain a human approval decision.
+
+I skipped a vector database for V1. The manager is working with one weekly evidence set, so a general retrieval layer would add complexity before the workflow needs it.
+
+I also kept LangGraph, CrewAI, and n8n out of the deadline build. The orchestration is explicit in Python, so every step remains easy to explain, test, and modify.
+
+## 12. Next two weeks
+
+The next version would focus on real adoption:
+
+- Add multi-repo project allowlists.
+- Add per-user authentication and durable storage.
+- Observe more managers using it on live updates.
+- Measure time to draft, time to approve, edit rate, and warning frequency.
+- Add scheduled collection.
+- Add controlled Gmail draft creation after approval.
+
+The long-term version would become a small operating layer for weekly delivery communication: sources come in, risks stay visible, updates are drafted, humans approve, and every run leaves a trace.
+
+## 13. Final reflection
+
+DeliveryBrief taught me that the valuable part of an AI workflow is the system around the model.
+
+The model helps write the draft. The product value comes from the evidence boundaries, validation, approval control, exports, and logs that make the draft safe to use.
+
+That is the kind of AI OS workflow I wanted to build for this Quest.

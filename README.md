@@ -93,16 +93,13 @@ The private live smoke test collected 26 GitHub records and one Google Drive not
 
 ## Documentation
 
-- [Decision record](docs/decisions.md)
 - [Operator runbook](docs/runbook.md)
+- [Reliability upgrade notes](docs/reliability-upgrade.md)
+- [Developer architecture](docs/developer-architecture.md)
+- [Architecture diagram](docs/architecture.svg)
 - [Evaluation package source](docs/evaluation-package.md)
 - [Case study source](docs/case-study.md)
 - [AI collaboration note](docs/ai-collaboration-note.md)
-- [Developer architecture](docs/developer-architecture.md)
-- [User interview guide](docs/user-interview.md)
-- [Five-minute demo script](docs/demo-script.md)
-- [Quest control sheet](docs/quest-control.md)
-- [Deadline confirmation email](docs/deadline-confirmation-email.md)
 - [Evaluation Package PDF](output/pdf/DeliveryBrief-Evaluation-Package.pdf)
 - [Case Study PDF](output/pdf/DeliveryBrief-Case-Study.pdf)
 - [AI Collaboration Note PDF](output/pdf/DeliveryBrief-AI-Collaboration-Note.pdf)
@@ -115,4 +112,4 @@ Live generation additionally requires `DELIVERYBRIEF_BUDGET_USD`. The budget led
 
 The “Tool selector” and “Workflow trace” panels are for handoff and debugging. They show selected/skipped sources, generation mode, approval/export availability, step status, output counts, latency, and redacted errors without storing raw note bodies or credentials.
 
-See [Reliability changes and failures](docs/reliability-upgrade.md) and [User timing session](docs/user-observation-session.md).
+See [Reliability changes and failures](docs/reliability-upgrade.md). A future timed user session should be recorded before claiming measured adoption or time savings.

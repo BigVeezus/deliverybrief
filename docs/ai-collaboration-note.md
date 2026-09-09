@@ -2,261 +2,102 @@
 
 ## Purpose
 
-This log records how I used AI during the Quest and how I checked its work. I remain responsible for the workflow choice, technical decisions, code, evaluation, claims, and submission.
+This note explains how I used AI during the DeliveryBrief Quest.
 
-## Collaboration entries
+I used AI to move faster, not to remove my own judgment from the work. My process was simple: I used AI to help plan, build, debug, test, and rewrite, then I reviewed the output, corrected the direction, and decided what was accurate enough to keep.
 
-### 7 September 2026 Quest interpretation and scope
+I did not submit AI output blindly. Several times, I rejected wording, changed the product direction, asked for simpler explanations, corrected technical assumptions, and made the documentation more honest and easier to defend in an interview.
 
-**Tool and model.** Codex coding agent.
+DeliveryBrief is still my work. I owned the problem choice, the scope, the user workflow, the trade-offs, the final claims, and the decision to keep the system safe and testable.
 
-**Delegated work.** I asked the agent to extract the Quest requirements, compare project directions, and turn the scoring rubric into a build strategy.
+## Why I used AI
 
-**Accepted.** I retained the recommendation to choose one recurring workflow with a measurable baseline, human approval, two integrations, and explicit failure cases.
+The Quest asked for a working AI OS mini-system in a short time. I treated AI as a productivity multiplier across the full workflow:
 
-**Rejected or corrected.** I did not accept the idea that a polished live demo alone would prove value. The plan now separates sample behavior from real-user evidence. I also changed the model-provider recommendation after confirming that I already had Anthropic API credit.
+- turning an ambiguous assessment into a practical delivery plan;
+- checking whether the project matched the job description;
+- scaffolding code faster than I could type everything manually;
+- helping me find edge cases I might miss under time pressure;
+- generating first drafts of documentation;
+- helping debug errors from Streamlit, Google Drive, GitHub, Claude, tests, and exports;
+- helping turn failures into regression tests.
 
-**Verification.** I checked the recommendation against the supplied Quest text and the Applied AI Engineer role description.
+The important point is that I did not treat the first output as final. I kept reviewing and pushing back until the system and documents matched what I actually wanted to submit.
 
-**Decision I owned.** I selected weekly delivery updates, a delivery manager as the user, GitHub plus Drive project notes as sources, a public demo, and Anthropic as the funded provider.
+## What I personally owned
 
-**Artifact.** `docs/decisions.md` and the implementation plan.
+I chose the DeliveryBrief problem because I have felt this pain myself as a lead engineer. Weekly delivery updates can become messy when the real status is split between pull requests, commits, developer notes, calls, and people’s memory.
 
-### 7 September 2026 System implementation
+I made the key product decisions:
 
-**Tool and model.** Codex coding agent.
+- The target user is a project or delivery manager preparing weekly updates.
+- The first version uses GitHub and developer notes.
+- GitHub is a strong V1 source because it contains pull requests, commits, reviews, merge history, issues, and reverts.
+- Jira was intentionally left out of V1 because it would add another permission system and another mapping problem before the core workflow was proven.
+- The system drafts updates but never sends them.
+- A human must review and approve the output before export.
+- Public demo data must be safe and anonymized.
+- Live Claude calls must use a budget cap.
+- Failures should be documented and converted into tests instead of hidden.
 
-**Delegated work.** I asked the agent to scaffold the Python application, typed schemas, source adapters, validation rules, storage, exports, evaluation fixtures, tests, and document drafts.
+AI helped me work through these implementations, but I made the decisions and final calls.
 
-**Accepted.** The implementation uses a credential-free demo path and separately configured live adapters. Every factual report item carries evidence IDs. External sending remains outside the system.
+## How AI helped and how I controlled it
 
-**Rejected or corrected.** No field metric, real-user quote, or adoption claim was generated. The documents include an evidence checklist instead of invented results.
+| Area | How AI helped | What I checked or changed |
+|---|---|---|
+| Planning | Helped break the Quest into deliverables, risks, and daily work | I chose the final project and scope |
+| Product thinking | Helped compare possible bottlenecks and user workflows | I selected weekly delivery updates from my own experience |
+| Engineering | Helped scaffold Python modules, Streamlit screens, validators, exports, and tests | I reviewed the behavior and requested changes when the system felt too shallow or too technical |
+| Evaluation | Helped create test cases, baseline comparisons, and failure logs | I corrected weak metrics and made the evaluation more practical |
+| Writing | Helped draft README, runbook, case study, evaluation package, and this note | I rejected wording that sounded generic, defensive, or too AI-written |
+| Debugging | Helped interpret errors and suggest fixes | I decided which fixes were safe to keep |
+| Cost control | Helped add estimate-only and budget-cap checks | I set the cost limits and avoided unnecessary paid calls |
 
-**Verification.** Static checks, automated tests, an evaluation run, application smoke testing, and rendered-document inspection must be recorded after execution.
+## Examples of where I corrected the AI
 
-**Decision I owned.** I will personally review the generated code, run the system with my credentials, conduct the user session, and approve every final claim.
+### 1. I corrected the voice of the documents
 
-**Artifact.** Repository implementation and `docs/evidence-needed.md`.
+Some early drafts described the work from the outside, using wording like “Elvis supplied...” That sounded wrong because this is my submission. I changed the documents to use first-person ownership where it made sense.
 
-### 7 September 2026 Deployment and Day 1 evidence planning
+Final approach: I say what I chose, observed, changed, tested, and decided.
 
-**Tool and model.** Codex coding agent.
+### 2. I made the evaluation clearer
 
-**Delegated work.** I asked the agent to verify the deployed Streamlit URL and break the Day 1 evidence work into practical next steps.
+The first evaluation package was too long and too technical. It explained too much in a way that could bore the reviewer. I asked for a shorter version that focused on the baseline, test set, important results, failures, and business value.
 
-**Accepted.** The app URL is recorded as `https://deliverybrief.streamlit.app/`. The Quest acceptance time is recorded as Monday, 7 September 2026 at 3:00 PM WAT. Erwin's reply confirmed that the timer is active.
+Final approach: the evaluation now explains what was tested, why it matters, what improved, and what still has limits.
 
-**Rejected or corrected.** The deployed URL was not treated as final because a logged-out check redirected to Streamlit sign-in. I need to make the app public before submitting it as the Working System link.
+### 3. I pushed the project beyond a prompt demo
 
-**Verification.** The deployed URL was checked without an existing logged-in browser session and returned a sign-in redirect instead of the public application.
+The job description is not looking for someone who only writes prompts. It is looking for someone who can build workflow systems. I pushed the project to show tool selection, trace logs, validation, approval gates, retries, exports, and reproducible tests.
 
-**Decision I owned.** I will collect real Day 1 evidence manually and only include user feedback, timing numbers, and examples that I can explain and defend.
+Final approach: DeliveryBrief behaves like a small workflow system, not just a Claude prompt wrapped in a web page.
 
-**Artifact.** `docs/quest-control.md`.
+### 4. I asked for messy input handling
 
-### 7 September 2026 Target-user perspective cleanup
+Real developer notes are not always clean. They can be pasted, uploaded, written as Google Docs, saved as text files, or sent as rough notes. I asked for the system to handle more note types and fail clearly when something is wrong.
 
-**Tool and model.** Codex coding agent.
+Final approach: the system supports live GitHub, Google Drive notes, pasted notes, uploaded JSON, and several document formats for notes.
 
-**Delegated work.** I gave the agent rough answers from the viewpoint of a project/product manager who sends weekly updates to an MD. I asked it to make the answers clearer and easier to use as Day 1 evidence.
+### 5. I made approval stricter
 
-**Accepted.** The cleaned note states the workflow, sources, bottleneck, trust conditions, rejection conditions, and examples of information that should not reach a client or MD.
+I did not want the approval button to be fake. The system now ties approval to the exact report version and evidence snapshot. If the report changes after approval, exports are blocked until the report is reviewed again.
 
-**Rejected or corrected.** I did not present this as a fake external interview. It is recorded as my target-user perspective, with a note that a separate external interview is still useful if time allows.
+Final approach: approval is a real safety gate, not just a UI step.
 
-**Verification.** I checked that the note reflects the supplied answers: weekly MD updates, GitHub PRs, developer notes, vague commits, document quality, context handling, consistency, and formatting.
+### 6. I separated public demo evidence from private live testing
 
-**Decision I owned.** I chose to use this as Day 1 proxy evidence while keeping the limitation visible.
+The public app uses safe sample data so reviewers can open it without credentials. I also ran a private local smoke test with GitHub, Google Drive notes, and Claude Haiku under a budget cap.
 
-**Artifact.** `evidence/day-1/interview-notes-self-perspective.md`.
+Final approach: the public demo is safe, and the private live path is verified without exposing raw private source text.
 
-### 7 September 2026 Weekly example cleanup
+## Final reflection
 
-**Tool and model.** Codex coding agent.
+AI made me faster, but it did not replace the work of thinking.
 
-**Delegated work.** I supplied three public-safe weekly examples covering payment retry risk, cross-repository contract coordination, and reporting-pipeline migration/revert context. I asked the agent whether they were sufficient and how to use them.
+The most useful part of using AI was not the first draft. It was the iteration: asking better questions, rejecting weak answers, finding edge cases, fixing bugs, simplifying explanations, and making sure the final work matched the problem.
 
-**Accepted.** The examples were recorded as anonymized reconstructed weeks, with manual time estimates of 55 minutes, 75 minutes, and 40 minutes. The shared pattern is that Git history alone does not explain the real delivery state.
+That is also how I would use AI in an operations or workflow automation role. I would not just prompt a model and trust it. I would build the workflow around it: inputs, tools, validation, approval, logs, costs, exceptions, and handoff.
 
-**Rejected or corrected.** I did not claim the examples are public PRs or exact production records. They are documented as reconstructed examples from real operating patterns.
-
-**Verification.** I reviewed that each example includes what happened, PR information, developer notes, MD-facing summary, action items, blockers, manual time estimate, and private information removed.
-
-**Decision I owned.** I chose to use reconstructed examples because public PRs were not available and private project material should not be exposed in a public Quest submission.
-
-**Artifact.** `evidence/day-1/weekly-examples-index.md` and `evidence/day-1/baseline-log.csv`.
-
-### 7 September 2026 Day 1 evaluation smoke test
-
-**Tool and model.** Codex coding agent and deterministic demo generator.
-
-**Delegated work.** I asked the agent to turn the three reconstructed weeks into a separate Day 1 evaluation dataset and run the current demo generator against it.
-
-**Accepted.** The Day 1 dataset was created separately from the official ten-case suite. The smoke test result was recorded even though it failed all three cases.
-
-**Rejected or corrected.** I did not hide the failure. The result shows that the demo generator cites evidence correctly but does not reliably split multiple action owners from one developer note.
-
-**Verification.** I reviewed the executed result: grounding, coverage, and safety were 100% on all three cases, while action-item accuracy was 50% on all three cases.
-
-**Decision I owned.** I will use this as a baseline limitation and compare it against Claude structured-output runs later.
-
-**Artifact.** `evaluation/day1/cases.json`, `evaluation/results/day1-demo.json`, and `evidence/day-1/day-1-summary.md`.
-
-### 7 September 2026 Anthropic Day 1 Haiku run and cost cap
-
-**Tool and model.** Codex coding agent, Anthropic Claude Haiku 4.5, and local evaluation command.
-
-**Delegated work.** I asked the agent to run the Day 1 reconstructed examples through Anthropic after adding my API key locally.
-
-**Accepted.** The agent confirmed only that the key was present, without printing it. Haiku passed all three Day 1 reconstructed cases. The result was saved as `evaluation/results/day1-haiku.json`.
-
-**Rejected or corrected.** The first Anthropic call exposed a schema compatibility bug: the structured-output schema needed explicit `additionalProperties: false`. I accepted the code fix and test for that. I also stopped further Sonnet reruns after deciding to cap cost.
-
-**Verification.** Tests, lint, and mypy passed after the schema/evaluator fixes. The Haiku run recorded 3 of 3 cases passed with 100% grounding, coverage, action accuracy, and safety on this small Day 1 dataset.
-
-**Decision I owned.** I chose Haiku as the default evaluation model for now because it passed the Day 1 examples at low cost. Sonnet should only be run again with explicit approval for a named comparison.
-
-**Artifact.** `deliverybrief/generator.py`, `deliverybrief/evaluation.py`, `tests/test_generator.py`, `tests/test_evaluation_workflow.py`, `evaluation/results/day1-haiku.json`, and `evidence/day-2/model-cost-control.md`.
-
-### 7 September 2026 Cost-estimation controls
-
-**Tool and model.** Codex coding agent.
-
-**Delegated work.** I asked whether the evaluation cost could be checked before running paid model calls.
-
-**Accepted.** The evaluation command now supports `--estimate-only` for a zero-cost local estimate and `--max-estimated-cost-usd` to stop before calling Anthropic when the estimate is above the approved cap.
-
-**Rejected or corrected.** I did not rely on memory or manual discipline as the only cost control. The estimator and cap are implemented in code and covered by tests.
-
-**Verification.** The Day 1 Haiku estimate ran without an API call. The full Haiku estimate ran without an API call. A test command with a $0.01 cap stopped before any paid run. Pytest, Ruff, and mypy passed.
-
-**Decision I owned.** I chose to require an estimate before future paid evaluation runs and to keep Sonnet gated behind explicit approval.
-
-**Artifact.** `deliverybrief/evaluation.py`, `deliverybrief/generator.py`, `tests/test_evaluation_workflow.py`, `tests/test_generator.py`, and `evidence/day-2/model-cost-control.md`.
-
-### 7 September 2026 Full Haiku evaluation and regression fixes
-
-**Tool and model.** Codex coding agent, local test suite, and Anthropic Claude Haiku 4.5.
-
-**Delegated work.** I approved running the full Haiku evaluation with a `$0.30` cap after reviewing the local estimate.
-
-**Accepted.** The final full Haiku result passed 9 of 9 scored report cases. The remaining transient API case is covered by an automated integration test. The result cost about `$0.025316` for the nine paid cases.
-
-**Rejected or corrected.** I did not accept the first 8-of-9 result as final. The failing cases led to two fixes: important evidence can no longer remain only in the executive summary, and action-like evidence is now flagged when no action owner or due date appears in the draft.
-
-**Verification.** Focused regressions for case 03 and case 06 passed. The final full Haiku run passed. Pytest, Ruff, and mypy passed after the fixes.
-
-**Decision I owned.** I kept Haiku as the default model because it passed the current full suite at low cost. I kept Sonnet disabled unless a specific comparison is approved later.
-
-**Artifact.** `evaluation/results/full-haiku.json`, `evidence/day-2/full-haiku-evaluation-summary.md`, `deliverybrief/generator.py`, `deliverybrief/evaluation.py`, and `deliverybrief/validator.py`.
-
-### 7 September 2026 Public app-run evidence
-
-**Tool and model.** Streamlit public app, deterministic demo generator, and Codex coding agent.
-
-**Delegated work.** I ran the public app in the browser, approved the generated sample report, and saved the exported files and screenshot. I asked the agent to organize the evidence.
-
-**Accepted.** The app-run artifacts were copied into `evidence/day-2/app-run/` and summarized as product-demo evidence.
-
-**Rejected or corrected.** I did not treat the sample app run as proof of real-world time savings. It is evidence that the deployed workflow can be opened, approved, and exported.
-
-**Verification.** The exported run summary shows `status: approved`, `evidence_count: 5`, `edits_made: true`, and no external sending. The screenshot shows the generated client-email preview with evidence IDs.
-
-**Decision I owned.** I chose to use this evidence for the Working System and Case Study while keeping the time-savings claim separate.
-
-**Artifact.** `evidence/day-2/app-run-summary.md` and files under `evidence/day-2/app-run/`.
-
-### 7 September 2026 Direct-prompt baseline
-
-**Tool and model.** Codex coding agent and Anthropic Claude Haiku 4.5.
-
-**Delegated work.** I asked the agent to run a direct-prompt baseline after the capped DeliveryBrief Haiku evaluation passed.
-
-**Accepted.** The direct baseline ran with a `$0.07` cap and saved results to `evaluation/results/direct-prompt-haiku.json`. It cost about `$0.007295` and passed 1 of 9 scored report cases under the automated audit.
-
-**Rejected or corrected.** I did not describe the result as proof that Haiku cannot write useful prose. The result is documented as an auditability gap: direct prompting lacks stable evidence IDs, structured output, deterministic validation, approval controls, and export records.
-
-**Verification.** The result file includes per-case excerpts, scoring details, and estimated cost. The comparison was added to the Evaluation Package and Case Study sources.
-
-**Decision I owned.** I chose to use this result to explain why DeliveryBrief adds workflow structure around the model instead of only calling Claude.
-
-**Artifact.** `evaluation/results/direct-prompt-haiku.json` and `evidence/day-2/direct-prompt-baseline-summary.md`.
-
-## Daily continuation format
-
-For every later use, add the date, task, tool and model, delegated work, accepted output, rejected or corrected output, verification, personal decision, and artifact reference. Link corrections to commits, tests, or result files where possible.
-
-### 8 September 2026 Reliability revision
-
-Tool and model: Codex coding agent in this task; no new Anthropic API requests. I requested messy samples, tests, documented decisions, client documents, and cost controls.
-
-Delegated: shared approval checks, evidence snapshots, session separation, input validation, connector pagination, 48 named cases, extra boundary/UI tests, document exports, and documentation updates.
-
-Accepted in the implementation: the Python/Streamlit architecture, conservative paid-request reservations, five free scenarios, and human-controlled approval.
-
-Corrected through inspection and tests: citation validity was mislabeled as grounding; storage approval bypassed UI validation; the phone detector damaged timestamps; “No completed work” triggered completion. These failures are recorded in the reliability log.
-
-Verification: executed pytest output feeds `evaluation/results/reliability-v2.json`. Static checks, browser verification, and rendered-document inspection support the handoff. These automated checks support reliability; they are not the same thing as a fresh paid Anthropic benchmark or a timed user-adoption study.
-
-My decisions: client updates stay primary, the public demo stays free, and additional paid model calls require approval. My final code walkthrough, factual review, and consenting-user observation are still pending. This entry does not claim they happened.
-
-Artifacts: `docs/reliability-upgrade.md`, the expanded tests, and the revised application.
-
-### 8 September 2026 Maintainability refactor
-
-Tool and model: Codex coding agent in this task; no Anthropic API requests.
-
-Delegated: separate the working prototype into clearer runtime layers while preserving the existing
-Streamlit entrypoint and old Python imports.
-
-Accepted in the implementation: generation now lives under `deliverybrief/generation/`, approval
-under `deliverybrief/approval/`, SQLite under `deliverybrief/persistence/`, exports under
-`deliverybrief/exporting/`, workflow orchestration under `deliverybrief/services/`, and the
-Streamlit UI under `deliverybrief/ui/`.
-
-Corrected through inspection and tests: moving Streamlit UI code exposed Python module-caching
-behavior in the test runner, so the root `app.py` now imports or reloads the UI module explicitly.
-Several scripts were changed so importing them does not accidentally execute work.
-
-Verification: the refactor added structure tests and kept the full automated suite passing locally.
-Ruff, mypy, pytest, and the secret scanner were run after the move. After push, GitHub Actions
-exposed a Linux import-path issue in the new structure test. I corrected the test to import helper
-scripts by file path and the final CI run `34189560471` passed.
-
-My decisions: review the refactor before merging, then keep the public demo on the verified
-`main` branch once local checks and GitHub Actions passed.
-
-Artifacts: `docs/developer-architecture.md`, `tests/test_project_structure.py`, and the refactored
-package folders.
-
-### 8 September 2026 Private live-source smoke and Drive note support
-
-Tool and model: Codex coding agent, local live-smoke harness, GitHub API, Google Drive/Docs APIs, and Claude Haiku 4.5.
-
-Delegated: build a repeatable private smoke test that uses configured credentials, calls GitHub, reads the shared Drive folder, calls Claude only after a budget check, approves through the same approval service, exports from the approved snapshot, and writes only a redacted public summary.
-
-Accepted in the implementation: one live run collected 26 GitHub records and one Drive text note for 7-8 September 2026, called Haiku once under a `$0.08` cap, returned valid structured JSON, produced warnings rather than blocks, approved the reviewed snapshot, and generated six exports at the time of the run.
-
-Corrected through inspection and tests: the first Google attempt found that my uploaded note was a `.txt` file, not a native Google Doc. I changed the Drive adapter to support native Google Docs, `.txt`, `.md`, `.csv`, and `.docx` notes. The first export attempt also failed because the harness tried to export with evidence that did not match the stored approval snapshot; I changed it to export from stored evidence, which is the correct safety behavior.
-
-Verification: focused integration tests cover text and DOCX extraction. The private live smoke passed after the harness correction. Raw smoke details and exports stay under ignored `tmp/live-smoke/`; the public summary is redacted.
-
-My decision: I will describe this as a private live-source smoke, not a full adoption study. It proves that the configured live path can collect sources, call Claude under a cap, validate, approve, and export without exposing private source text in the repository.
-
-Artifacts: `scripts/live_smoke.py`, `deliverybrief/integrations/google_docs.py`, `tests/test_integrations.py`, and `evidence/live-smoke/live-smoke-summary.md`.
-
-### 8 September 2026 Tool selector and workflow trace upgrade
-
-Tool and model: Codex coding agent in this task; no Anthropic API requests.
-
-Delegated: add a lightweight orchestration layer that shows tool selection, skipped tools, trace steps, attempts, latency, redacted errors, approval/export state, and a CLI smoke-test entrypoint.
-
-Accepted in the implementation: I kept orchestration explicit in Python. The app now has a `ToolSelector` service, `ToolSelection` and `WorkflowTraceStep` models, trace helpers, SQLite persistence for traces, a Streamlit trace panel, a workflow-trace JSON export, and `deliverybrief-live-smoke` as a console entrypoint.
-
-Rejected or corrected: I did not add LangGraph, CrewAI, n8n, or another orchestration framework this late because that would add integration risk without improving the reviewer’s ability to inspect this five-day workflow. I also corrected the trace redactor so private GitHub/Drive/Docs URLs do not appear in trace output.
-
-Verification: 97 pytest tests passed, including new tests for demo/live tool selection, missing-budget behavior, Drive and user-supplied source labels, generation/validation/approval/export traces, edit-after-approval invalidation, trace redaction, safe script import, and the estimate-only live-smoke path. Ruff, strict mypy, the secret scan, and GitHub Actions run `34221962129` passed after the change.
-
-My decision: I will explain this as workflow orchestration implemented directly in Python: tool selection, state, retries, validation, approval gates, trace logging, and reproducible exports. I will not pretend that using a framework name is the same thing as building a reliable workflow.
-
-Artifacts: `deliverybrief/services/tool_selector.py`, `deliverybrief/services/tracing.py`, `tests/test_tool_selector_trace.py`, `deliverybrief/ui/app.py`, `deliverybrief/exporting/service.py`, and `scripts/live_smoke.py`.
+DeliveryBrief is my example of that approach.

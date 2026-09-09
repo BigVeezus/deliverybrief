@@ -1,70 +1,231 @@
 # DeliveryBrief Evaluation Package
 
-## What this evaluation establishes
+## 1. What I evaluated
 
-DeliveryBrief has an expanded set of 48 named workflow cases, plus regression, interface, integration, structure, CLI, and trace tests. The current local suite has 97 passing tests. The 48 named cases pass as 36 development cases and 12 reserved cases. These software checks cover intake, validation, approval, exports, privacy patterns, tool selection, trace redaction, cost-control paths, and failure handling. They sit beside the public app run, the private live-source smoke test, earlier capped Haiku runs, and CI evidence.
+DeliveryBrief is a workflow tool for a project/product manager who has to prepare weekly delivery updates from messy engineering sources.
 
-The executed results are in `evaluation/results/reliability-v2.json`. The complete test output is reproducible with `pytest --junitxml=output/reliability-tests.xml` followed by `python scripts/summarize_reliability.py`. I use GitHub Actions as the remote verification check; the refactored `main` branch passed CI in run `34189560471` after a Linux import-path issue in the structure test was corrected. The trace upgrade then passed CI in run `34221962129`; it adds tests around tool selection, trace storage, trace redaction, approval invalidation, workflow-trace export, and the estimate-only live-smoke CLI path.
+The main question I tested was simple:
 
-External research helped sanity-check the problem. PMI's communications report links unclear project communication with project risk. DORA's value-stream guidance points teams toward information flow, wait time, and handoffs when looking for delivery bottlenecks. DORA's loosely coupled teams guidance also treats cross-team dependencies as measurable delivery friction. GitHub Projects and Issues connect planning to issues and pull requests, but they do not write the weekly client update for the manager. I used these sources to shape the problem and metrics, not as evidence that DeliveryBrief has adoption. Sources: `https://www.pmi.org/learning/library/en-2013-pulse-high-cost-low-performance-13512`, `https://dora.dev/guides/value-stream-management/`, `https://dora.dev/capabilities/loosely-coupled-teams/`, and `https://github.com/features/issues`.
+> Can a manager turn GitHub activity and developer notes into a client-ready weekly update without losing important context, inventing facts, leaking private details, or depending on perfect prompting?
 
-## Baselines and provenance
+I evaluated DeliveryBrief across four areas:
 
-I supplied three anonymized reconstructed operating weeks: payment retries, mobile/backend coordination, and an ingest migration revert. Their manual preparation estimates are 55, 75, and 40 minutes, with a median of 55 minutes. No stopwatch measurement or independent interview is claimed.
+- Evidence collection from GitHub, Google Drive notes, and pasted developer notes
+- Draft generation with required evidence references
+- Validation, approval, and export controls
+- Reliability across messy notes, missing context, failures, privacy risks, and repeated runs
 
-The private live-source smoke test collected 26 GitHub records and one Google Drive note for 7-8 September 2026. The first run exposed a real file-handling gap: the uploaded note was a `.txt` file, while the adapter only listed native Google Docs. I added Drive note support for `.txt`, `.md`, `.csv`, and `.docx`, kept unsupported files explicit, and reran the smoke. Claude Haiku returned a valid structured report in one attempt. The conservative request estimate was `$0.049441`; the actual estimated cost was `$0.018218`; latency was 22,109 ms. Approval produced six exports from the stored approved snapshot at the time of the run. The later trace upgrade adds a seventh approved export, `Workflow trace.json`, without requiring another paid model call. The public redacted summary is `evidence/live-smoke/live-smoke-summary.md`.
+The current version has:
 
-The earlier Haiku structured-workflow run returned 9 of 9 under a v1 proxy evaluator, costing an estimated $0.025316 with median generation latency of 6,444 ms. The direct-prompt baseline returned 1 of 9 under a different keyword evaluator and cost an estimated $0.007295. The original JSON files remain unchanged. Because the scorers differed, this is learning evidence rather than a controlled model-quality comparison.
+- 48 named workflow cases
+- 97 automated tests
+- Five public-safe demo scenarios
+- One private live smoke test using GitHub, Google Drive, Google Docs access, and Claude Haiku
+- Client PDF, DOCX, email, CSV, JSON, run summary, and workflow trace exports
 
-The old measure named grounding checked citation IDs, coverage counted handled evidence IDs, and action accuracy counted expected owners. These proxies could reward an incorrect statement with a valid citation. The revision corrects the terminology and method. A new paid model comparison was not run; additional spending was not authorized.
+## 2. Why this problem matters
 
-## Measures and thresholds
+Weekly delivery updates look simple, but in real project work they are often built from scattered, incomplete information.
 
-Citation validity is the share of cited IDs present in the supplied evidence. It is reported separately from factual grounding.
+External research matched the pain points I observed:
 
-Factual grounding is supported claims divided by reviewed claims. Every summary, report item, and action is presented for review against its evidence. A named reviewer and an exact report fingerprint are required. The release target is 95 percent because unsupported client claims create trust risk.
+- PMI reports that ineffective project communication creates major delivery risk, especially when teams fail to communicate goals, actions, and business impact clearly.  
+  Source: [PMI — Essential Role of Communications](https://www.pmi.org/learning/thought-leadership/pulse/essential-role-communications)
 
-Coverage is expected facts represented divided by all expected facts. A warning about an evidence record does not automatically count as factual coverage. The target is 90 percent because omitted delivery risks can mislead the client even in otherwise accurate prose.
+- DORA’s delivery guidance treats handoffs, wait time, and cross-team dependencies as real software-delivery bottlenecks, not just “communication problems.”  
+  Source: [DORA — Loosely Coupled Teams](https://dora.dev/capabilities/loosely-coupled-teams/)
 
-Action accuracy uses one-to-one reviewed matches of task, owner, and due date. Its F1 score is twice the matched count divided by the number of output actions plus expected actions. Extra invented actions reduce the score. The target is 85 percent.
+- GitHub supports linking issues, pull requests, labels, projects, and dependencies, but those records still do not automatically become a clean weekly update for an MD or client.  
+  Sources: [GitHub — Linking PRs to issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue), [GitHub — Planning and tracking with Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects)
 
-Exception handling measures whether the expected workflow behavior occurred. Correct blocking and unnecessary blocking are recorded separately. Privacy, approval, session isolation, and budget checks are hard release gates.
+The product decision was therefore not “summarize GitHub.” The real workflow is:
 
-Weighted reviewed quality remains 35 percent grounding, 25 percent coverage, 20 percent action accuracy, and 20 percent exception behavior. Reports without completed factual review remain `awaiting_review`; their factual scores are null, not 100 percent.
+> collect evidence → detect what is missing or risky → draft the update → let a human review it → export a clean client version.
 
-Time reduction is (manual task time minus app task time) divided by manual task time, reported across comparable paired tasks. Include collection, correction, review, and export. The median 60 percent target remains unmeasured.
+## 3. Baseline examples
 
-## Test set
+I used three anonymized operating weeks based on the kind of project-management updates I handle:
 
-| Group | Cases | What the tests exercise |
-| --- | --- | --- |
-| Normal reporting | 6 | Quiet weeks, accepted work, ongoing work, action fields |
-| Messy notes and PRs | 8 | Vague descriptions, typos, several owners, duplicates, Unicode |
-| Context and timelines | 8 | Reverts, undeployed merges, conflicts, dates, dependencies |
-| Privacy and hostile text | 8 | Fake secrets, personal data, instructions, private links, uncertainty |
-| API and input failures | 8 | Pagination, timeout, rate limit, denied access, invalid and oversized input |
-| Approval and exports | 10 | Direct bypass, edits, evidence changes, sessions, legacy records, documents, CSV, budgets |
+| Week | Problem pattern | Manual estimate |
+|---|---:|---:|
+| Payment retry risk | PRs were vague; old queued jobs still created release risk | 55 min |
+| Mobile/backend mismatch | Two repos changed a shared contract without clear written coordination | 75 min |
+| Migration revert | Git history showed a revert, but the reason was only in notes | 40 min |
 
-Each catalog case identifies synthetic provenance, its input, expected behavior, test reference, executed outcome, and failure explanation. The reconstructed B/C/D examples remain separately labeled in the app. Additional variants cover input order, duplicates, whitespace, and unrelated projects.
+Median manual estimate: 55 minutes.
 
-The last two cases in each group were reserved before the first expanded execution. All 12 passed their first executed assertions. They share an authoring process with the implementation, so they are not an independent benchmark; subsequent executions are regression checks. Any case used for a later fix loses its unseen status.
+These examples are not random toy prompts. They test the exact problem DeliveryBrief is built for: GitHub shows part of the truth, but the missing business context usually sits in developer notes, calls, or chat.
 
-The trace tests are intentionally separate from the 48 scenario cases. They check that demo mode selects sample evidence and skips Claude, live mode without a positive budget skips Claude before any paid call, Drive and user-supplied inputs are labeled correctly, trace records survive through generation/validation/approval/export, editing after approval blocks export, sensitive values are redacted, and the live-smoke estimate path does not construct an Anthropic generator.
+## 4. Live smoke test
 
-## Failures and learning
+I also ran the private live path locally.
 
-The earlier storage method approved reports without revalidation. Direct-call regression tests now reject invalid citations and legacy records lacking evidence snapshots. Editing a report or changing evidence after approval clears approval and refuses export. This check runs below the interface.
+Live setup: GitHub repository activity, one Google Drive developer note, Claude Haiku, a `$0.08` budget cap, no public fallback, and no private raw content committed.
 
-The v1 citation proxy could award full credit to an unsupported statement. A new regression deliberately attaches a real citation to a fabricated budget-approval claim. Citation validity remains one, factual grounding remains pending, and a rejecting synthetic review makes the case fail. The synthetic reviewer is test data, not my human review.
+Result:
 
-During the revision, the phone detector damaged ISO timestamps. Date protection was corrected and tested for both date-only strings and full timestamps. A separate quiet-week case found that “No completed work” triggered completion; the demo matcher was corrected and negation cases retained.
+| Check | Result |
+|---|---:|
+| GitHub records collected | 26 |
+| Google Drive notes collected | 1 |
+| Claude structured report | Passed in 1 attempt |
+| Estimated request cost before run | `$0.049441` |
+| Actual estimated cost after run | `$0.018218` |
+| Latency and approval/export | 22.1 sec; passed from stored snapshot |
 
-Earlier Anthropic schema rejection and the missing cross-repository/action findings remain in the historical evidence. Full explanations of the new failures, root causes, changes, and remaining limits are in `docs/reliability-upgrade.md`.
+This test also found a useful real issue: my uploaded developer note was a `.txt` file, not a native Google Doc. I updated the Drive adapter to support common note formats including `.txt`, `.md`, `.csv`, and `.docx`.
 
-## Costs and remaining evidence
+That improvement matters because real PM notes do not always arrive in one perfect format.
 
-The live smoke used one paid Haiku request under the `$0.08` cap. Public scenarios remain free simulations. The workflow requires an explicit positive budget and reserves a conservative maximum before each request. Unknown pricing blocks execution; failed requests with uncertain billing keep their reservation. The maximum is three attempts and hidden SDK retries are disabled. The CLI has an estimate-only path so I can check configured sources and request cost before constructing the Anthropic generator.
+## 5. Evaluation metrics
 
-Application reservations do not cap unrelated account spending. Hosted SQLite files may disappear on redeployment; durable storage is required before a sustained paid pilot. Estimates are not provider billing guarantees.
+I used metrics that connect directly to client risk.
 
-Remaining evidence before stronger adoption claims: a consenting user's complete timed task, my final claim/code review, and the demo video. The live-source path has been checked privately with GitHub, Drive notes, Google Docs API access, and Claude Haiku. Software tests still do not replace a timed user study.
+| Metric | What it checks | Why it matters |
+|---|---|---|
+| Citation validity | Every cited evidence ID exists | Prevents fake references |
+| Factual grounding | Claims are supported by the cited evidence | Prevents false client updates |
+| Coverage | Expected important facts appear in the update | Prevents missing risks or blockers |
+| Action accuracy | Task, owner, and due date are correct | Prevents weak follow-up |
+| Exception handling | The workflow blocks or warns correctly | Prevents unsafe approval |
+| Privacy safety | Secrets, private links, PII, and internal blame are kept out | Protects client trust |
+| Approval control | Exports only come from approved snapshots | Prevents accidental wrong versions |
+| Cost control | Paid model calls require an explicit budget | Prevents surprise spend |
+
+Release targets:
+
+- 95% factual grounding after review
+- 90% expected-fact coverage
+- 85% action accuracy
+- 90% scenario pass rate
+- 100% pass for privacy, approval, and budget-control gates
+
+## 6. Test set
+
+The test set has 48 named workflow cases.
+
+| Group | Cases | Examples |
+|---|---:|---|
+| Normal reporting | 6 | Completed work, quiet week, ongoing work |
+| Messy notes and PRs | 8 | “wip” PRs, missing descriptions, typos, duplicate notes |
+| Context and timelines | 8 | Reverts, merged-but-not-deployed work, stale dates, cross-repo dependencies |
+| Privacy and hostile content | 8 | Fake secrets, private emails, prompt injection, unsupported promises |
+| API and input failures | 8 | Pagination, timeout, rate limit, denied access, malformed input |
+| Approval and exports | 10 | Edit after approval, direct bypass, session isolation, unsafe CSV cells |
+
+The goal was not to make the app pass happy-path examples. The goal was to test the ugly cases a PM actually sees.
+
+## 7. Important failures found and fixed
+
+### Failure 1 — Approval was too easy to trust
+
+Earlier, approval depended too much on the interface state.
+
+Fix:
+
+- Approval now revalidates the stored evidence snapshot
+- Editing a report removes approval
+- Changing source evidence removes approval
+- Exports fail if the approved report version does not match the current report
+
+Why it matters:
+
+A manager should not accidentally export an old or unsafe version.
+
+### Failure 2 — A valid citation did not prove the claim was true
+
+The first evaluator treated “has a real evidence ID” as grounding. That was too weak.
+
+Fix:
+
+- Citation validity is now separate from factual grounding
+- Grounding requires claim-by-claim review against evidence
+- Unsupported claims remain review failures even if they cite a real record
+
+Why it matters:
+
+A wrong statement with a real citation is still wrong.
+
+### Failure 3 — Notes were not always Google Docs
+
+The first live Google test found that a developer note could be uploaded as plain text.
+
+Fix:
+
+- Added support for native Google Docs, `.txt`, `.md`, `.csv`, and `.docx`
+- Unsupported files now fail clearly instead of silently disappearing
+
+Why it matters:
+
+A workflow tool should handle normal messy inputs, not only ideal inputs.
+
+### Failure 4 — Negation changed meaning
+
+A test case with “no completed work” was initially at risk of being treated like completed work.
+
+Fix:
+
+- Added regression coverage for quiet weeks and negated statements
+- The app now treats “not deployed,” “not confirmed,” and “no completed work” carefully
+
+Why it matters:
+
+Client updates must not turn uncertainty into progress.
+
+## 8. Cost and model control
+
+DeliveryBrief does not call Claude automatically.
+
+Claude is only used when the manager clicks **Generate weekly brief** in live mode and a positive budget is configured.
+
+The app:
+
+- Estimates request cost before generation
+- Reserves budget before each attempt
+- Uses at most three attempts
+- Disables hidden SDK retries
+- Refuses unknown pricing
+- Does not fall back to demo output during live runs
+
+This is intentional. A workflow system should make paid model use visible and controlled.
+
+## 9. What the evaluation proves
+
+This evaluation proves that DeliveryBrief is more than a prompt wrapper.
+
+It has:
+
+- Tool selection
+- Source-specific evidence collection
+- File-processing paths
+- Structured generation
+- Deterministic validation
+- Human approval gates
+- Version-bound exports
+- Cost controls
+- Workflow trace logging
+- Regression tests for messy inputs and unsafe outputs
+
+The public demo is safe to run without credentials. The private live path has also been checked with real GitHub, Google Drive, and Claude access.
+
+## 10. Remaining limits
+
+The current version is intentionally scoped.
+
+Known limits:
+
+- V1 supports one configured project repository
+- Multi-repo selection should be added with a strict allowlist, not open-ended access
+- Hosted Streamlit storage is not a durable production audit database
+- Pattern-based privacy checks cannot understand every confidential business situation
+- A full timed user adoption study is still the next best evidence to collect
+
+These are acceptable V1 limits because the core workflow already works end-to-end, and the boundaries are clear.
+
+## 11. Final evaluation summary
+
+DeliveryBrief meets the five-day goal: it turns scattered delivery evidence into a reviewed, exportable weekly update while keeping the human in control.
+
+The strongest evidence is not just that the app generates a report. The stronger point is that it knows when not to approve, when not to export, when not to spend money, and when the evidence is not strong enough.
+
+That is the workflow behavior I wanted to demonstrate.

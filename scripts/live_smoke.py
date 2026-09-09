@@ -348,6 +348,7 @@ def main() -> None:
         settings.anthropic_api_key or "",
         settings.primary_model,
         BudgetLedger(args.budget_db, budget_cap),
+        timeout_seconds=settings.anthropic_timeout_seconds,
     )
     result, record = generate_and_record(
         generator,

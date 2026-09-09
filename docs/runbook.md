@@ -125,6 +125,8 @@ Each browser session has an independent run scope. The default local CLI scope c
 
 Set an explicit positive `DELIVERYBRIEF_BUDGET_USD` for live generation. No budget means no model calls. The `workflow-budget.db` ledger reserves a conservative request maximum before each attempt; uncertain failures keep their reservation. There are no hidden Anthropic SDK retries. Do not delete the ledger to retry a request. Raising its limit requires my approval.
 
+For hosted live demos, set `ANTHROPIC_TIMEOUT_SECONDS=90` or higher. Streamlit Cloud and provider latency can make a 30-second timeout too tight. If a request times out, the workflow may reserve budget for that attempt even when no final report is returned; raise the demo budget cap deliberately instead of repeatedly clicking Generate.
+
 For an alternate model, configure its exact identifier in `ANTHROPIC_PRICED_MODEL` and explicit `ANTHROPIC_MODEL_INPUT_PER_MTOK` and `ANTHROPIC_MODEL_OUTPUT_PER_MTOK` rates after checking provider pricing. Unknown or invalid rates block requests. Historical Haiku pricing assumptions remain configuration-dependent estimates. These application controls do not cap unrelated provider-account spending.
 
 Run records contain version fingerprints, attempts, usage, validation, approval information, and workflow traces. SQLite `audit_events` records generation failures by error type without raw provider content. Public app logs are temporary. Rotate a leaked key in its provider console, replace the configured secret, and restart the private live instance.

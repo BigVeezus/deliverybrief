@@ -17,6 +17,7 @@ class Settings:
     anthropic_api_key: str | None
     primary_model: str
     quality_model: str
+    anthropic_timeout_seconds: float
     github_token: str | None
     google_service_account_json: str | None
     database_path: Path
@@ -51,6 +52,7 @@ def load_settings() -> Settings:
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY") or None,
         primary_model=os.getenv("ANTHROPIC_PRIMARY_MODEL", "claude-haiku-4-5"),
         quality_model=os.getenv("ANTHROPIC_QUALITY_MODEL", "claude-sonnet-5"),
+        anthropic_timeout_seconds=float(os.getenv("ANTHROPIC_TIMEOUT_SECONDS", "90")),
         github_token=os.getenv("GITHUB_TOKEN") or None,
         google_service_account_json=os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON") or None,
         database_path=Path(os.getenv("DELIVERYBRIEF_DB_PATH", "deliverybrief.db")),

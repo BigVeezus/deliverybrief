@@ -33,8 +33,14 @@ from .schema import (
 class AnthropicReportGenerator:
     kind = "anthropic"
 
-    def __init__(self, api_key: str, model: str, budget: BudgetLedger | None = None) -> None:
-        self.client = Anthropic(api_key=api_key, max_retries=0, timeout=30.0)
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        budget: BudgetLedger | None = None,
+        timeout_seconds: float = 90.0,
+    ) -> None:
+        self.client = Anthropic(api_key=api_key, max_retries=0, timeout=timeout_seconds)
         self.model = model
         self.budget = budget
 
@@ -118,6 +124,13 @@ class AnthropicReportGenerator:
         except Exception as error:
             detail = " ".join(str(error).split())
             detail = safe_detail(detail)
+            if type(error).__name__ == "APITimeoutError":
+                raise ReportGenerationError(
+                    "Claude did not finish before the workflow timeout. "
+                    "Try again with fewer notes or a higher ANTHROPIC_TIMEOUT_SECONDS value. "
+                    f"Failure type: {type(error).__name__}. Detail: {detail}. "
+                    "No demo fallback was used."
+                ) from error
             raise ReportGenerationError(
                 "Claude returned output that did not match the required report structure. "
                 f"Failure type: {type(error).__name__}. Detail: {detail}. "

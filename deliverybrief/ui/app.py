@@ -328,6 +328,7 @@ if st.button("Generate weekly brief", disabled=not ack_partial or st.session_sta
                         Path("workflow-budget.db"),
                         float(os.getenv("DELIVERYBRIEF_BUDGET_USD", "0")),
                     ),
+                    timeout_seconds=settings.anthropic_timeout_seconds,
                 )
             )
             with st.spinner("Preparing draft and checking evidence"):
